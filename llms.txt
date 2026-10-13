@@ -11,7 +11,7 @@
 - Search index (JSON): https://commerceplugs.com/search-index.json
 
 ## Stores
-- [Showers4Less](https://commerceplugs.com/stores/showers4less/) — independent store, sells direct at https://showers4less.com. Categories: Home & Bath. Listings published: 0. Listing pending verification; shipping, currency and catalog not yet confirmed.
+- [Showers4Less](https://commerceplugs.com/stores/showers4less/) — independent store, sells direct at https://showers4less.com. Categories: Home & Bath, Sports & Fitness. Listings published: 100. Verified 2026-10-13
 
 ## Categories
 - [Home & Bath](https://commerceplugs.com/c/home-bath/): Fixtures, enclosures, storage and everything that makes a room work.

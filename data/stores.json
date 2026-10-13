@@ -2,21 +2,36 @@
   {
     "slug": "showers4less",
     "name": "Showers4Less",
+    "legal_name": "Aging Safely Baths",
     "url": "https://showers4less.com",
-    "categories": ["home-bath"],
+    "categories": [
+      "home-bath",
+      "sports-fitness"
+    ],
     "plan": "index",
     "claimed": false,
-    "listing_status": "pending_verification",
-    "catalog_status": "not_connected",
+    "listing_status": "verified",
+    "catalog_status": "connected",
     "added": "2026-10-13",
-    "tagline": null,
-    "summary": null,
-    "ships_from": null,
-    "ships_to": [],
-    "currency": null,
-    "price_band": null,
-    "returns": null,
-    "verified": null,
-    "values": []
+    "verified": "2026-10-13",
+    "tagline": "Accessible showers, walk-in systems, saunas and cold plunge, direct.",
+    "summary": "Showers4Less is an independent online retailer in Denver, Colorado, operated by Aging Safely Baths. It specialises in accessible bathing: roll-in and barrier-free showers, ADA transfer showers, low-threshold walk-in systems, shower bases and pans, frameless and framed doors, steam generators and shower panels. The range also covers recovery equipment \u2014 infrared, outdoor and portable saunas, and cold plunge tubs. Products are sold DIY-ready or with installation, and the catalog runs from single fixtures to complete packages. Brands carried include ANZZI, Bestbath, SaunaSpa and SteamSpa.",
+    "ships_from": "Denver, Colorado, United States",
+    "ships_to": [
+      "United States",
+      "Canada"
+    ],
+    "currency": "USD",
+    "price_band": "$$$",
+    "returns": "Ships to all 50 US states and Canada; availability varies by product and delivery method. Custom, modified and made-to-order products are final sale. See the store's refund policy for full terms.",
+    "policy_urls": {
+      "shipping": "https://showers4less.com/policies/shipping-policy",
+      "returns": "https://showers4less.com/policies/refund-policy"
+    },
+    "values": [
+      "Accessible bathing specialist",
+      "Ships US & Canada",
+      "DIY or installed"
+    ]
   }
 ]

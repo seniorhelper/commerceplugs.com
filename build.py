@@ -176,6 +176,55 @@ def catalog_tag(s):
         return '<span class="tag tag-ok">Catalog connected</span>'
     return '<span class="tag">Catalog not connected</span>'
 
+def money_mono(v):
+    try: return f"${float(v):,.2f}"
+    except Exception: return "$" + str(v)
+
+def listing_row(p):
+    """One line of a trade price list. No card, no float, no radius."""
+    s = STOREBY.get(p["store"], {})
+    img = (f'<img src="{e(p["image"])}" alt="" loading="lazy" decoding="async">'
+           if p.get("image") else f'<span class="sm muted">{e((p.get("sku") or "")[:6])}</span>')
+    bits = []
+    if p.get("brand"): bits.append(f'<b>{e(p["brand"])}</b>')
+    if p.get("subcategory"): bits.append(e(p["subcategory"]))
+    if p.get("dimensions"): bits.append(e(p["dimensions"]))
+    if p.get("finish"): bits.append(e(p["finish"]))
+    bits.append("in stock" if p.get("availability") == "in_stock" else e(p.get("availability", "")))
+    if p.get("sku"): bits.append(e(p["sku"]))
+    meta = '<span class="sep">·</span>'.join(bits)
+    desc = f'<p class="desc">{e(p["blurb"])}</p>' if p.get("blurb") else ""
+    return f"""<div class="row">
+  <span class="th">{img}</span>
+  <div>
+    <a class="ttl" href="{e(p["url"])}" rel="nofollow noopener" target="_blank">{e(p["title"])}</a>
+    <p class="meta">{meta}</p>
+    {desc}
+  </div>
+  <div class="amt">
+    <span class="p">{money_mono(p["price"])}</span>
+    <a class="go" href="{e(p["url"])}" rel="nofollow noopener" target="_blank">{e(s.get("name", "store"))} \u2192</a>
+  </div>
+</div>"""
+
+def index_entry(name, href, count, unit=""):
+    return (f'<a class="ix" href="{href}"><span class="nm">{e(name)}</span>'
+            f'<span class="lead"></span><span class="ct">{count}{unit}</span></a>')
+
+def register_row(i, s):
+    cats = ", ".join(CATBY[c]["name"] for c in s.get("categories", []) if c in CATBY)
+    n = len([x for x in PRODUCTS if x["store"] == s["slug"]])
+    state = (f'verified {e(s["verified"])}' if s.get("verified") else "pending verification")
+    return f"""<tr>
+  <td class="ix-n">{i:02d}</td>
+  <td class="nm"><a href="/stores/{e(s["slug"])}/">{e(s["name"])}</a>
+    <span class="dom">{e(host(s["url"]))}</span></td>
+  <td>{e(cats)}</td>
+  <td>{e(", ".join(s.get("ships_to", [])) or "\u2014")}</td>
+  <td class="num">{n}</td>
+  <td class="num"><span class="rail">{state}</span></td>
+</tr>"""
+
 def product_card(p):
     s = STOREBY.get(p["store"], {})
     return f"""<article class="card card-hover prod">
@@ -216,211 +265,182 @@ def open_slot(label="Category open"):
 
 # ---------------------------------------------------------------- pages
 def page_home():
-    featured = STORES[0] if STORES else None
-    prods = PRODUCTS[:12]
-    cat_tiles = "".join(
-        f"""<a class="cat" href="/c/{c["slug"]}/">
-  <div class="ic">{icon(c["icon"])}</div>
-  <h3>{e(c["name"])}</h3>
-  <p>{e(c["blurb"])}</p>
-</a>""" for c in CATS)
+    by_cat = {c["slug"]: len([p for p in PRODUCTS if p.get("category") == c["slug"]]) for c in CATS}
+    live   = [c for c in CATS if by_cat[c["slug"]]]
+    open_c = [c for c in CATS if not by_cat[c["slug"]]]
 
-    prod_html = "".join(product_card(p) for p in prods)
-    if prods:
-        listings_section = f"""<section class="sec" style="background:var(--surface);border-top:var(--rail);border-bottom:var(--rail)"><div class="wrap">
-  <div class="sec-head">
-    <div><p class="eyebrow alt">Live listings</p><h2>In stock right now.</h2></div>
-    <a class="btn btn-sm btn-ghost" href="/search/">Search everything</a>
-  </div>
-  <div class="grid g4">{prod_html}</div>
-</div></section>"""
-    else:
-        listings_section = f"""<section class="sec" style="background:var(--surface);border-top:var(--rail);border-bottom:var(--rail)"><div class="wrap">
-  <div class="sec-head">
-    <div><p class="eyebrow alt">Opening now</p><h2>The index is live. The shelves are not full yet.</h2></div>
-  </div>
-  <div class="split" style="margin-top:0">
-    <div>
-      <p>We are not going to pad this page out with made-up products to look bigger than we are. Product listings appear here when a store connects a catalog feed, and not a second before. Right now {len(STORES)} store{"s" if len(STORES)!=1 else ""} {"are" if len(STORES)!=1 else "is"} indexed and {len(CATS)} categories are open.</p>
-      <p>If you sell something good and you are tired of renting your own customers back from a marketplace, this is the moment to be early.</p>
-      <div class="hero-cta"><a class="btn btn-brand" href="/for-brands/">Why list here</a><a class="btn btn-ghost" href="/join/">Apply to list</a></div>
-    </div>
-    <div class="machine">
-      <div class="machine-bar"><span>what you will not find on this site</span><span class="led"></span></div>
-      <pre>  <span class="k">×</span> invented products
-  <span class="k">×</span> estimated prices
-  <span class="k">×</span> stock we did not check
-  <span class="k">×</span> affiliate links in listings
-  <span class="k">×</span> paid placement dressed as editorial
-  <span class="s">+</span> a date on every record</pre>
-    </div>
-  </div>
-</div></section>"""
-    store_html = "".join(store_card(s) for s in STORES) + open_slot("Your brand here")
-
-    sample = {"index": SITE["domain"], "stores": len(STORES), "listings": len(PRODUCTS),
-              "categories": len(CATS), "commission": "0%", "checkout": "seller's own",
-              "built": TODAY, "feed": BASE + "/feeds/stores.json",
-              "mcp": BASE + "/.well-known/mcp/server.json"}
-    pretty = json.dumps(sample, indent=2)
+    ix_live = "".join(index_entry(c["name"], f'/c/{c["slug"]}/', by_cat[c["slug"]]) for c in live)
+    ix_open = "".join(index_entry(c["name"], f'/c/{c["slug"]}/', "\u2014") for c in open_c)
+    reg = "".join(register_row(i + 1, s) for i, s in enumerate(STORES))
+    recent = "".join(listing_row(p) for p in PRODUCTS[:14])
 
     ld = [{"@context":"https://schema.org","@type":"WebSite","name":BRAND,"url":BASE+"/",
            "potentialAction":{"@type":"SearchAction","target":{"@type":"EntryPoint","urlTemplate":BASE+"/search/?q={search_term_string}"},"query-input":"required name=search_term_string"}},
           {"@context":"https://schema.org","@type":"Organization","name":BRAND,"url":BASE+"/","description":SITE["pitch"]}]
 
     body = f"""{header()}
-<main id="main">
-<section class="hero"><div class="wrap hero-in">
-  <div>
-    <p class="eyebrow">Independent stores · machine readable</p>
-    <h1>Shop the brands Amazon buried.</h1>
-    <p class="lede">{e(SITE["pitch"])} Search real independent stores, then buy on their own site. We never touch the transaction.</p>
-    <div class="hero-cta">
-      <a class="btn btn-brand btn-lg" href="#categories">Start shopping</a>
-      <a class="btn btn-ghost btn-lg" href="/for-brands/">List your brand</a>
-    </div>
-    <p class="rail mt2"><b>No marketplace fees</b><span class="dot"></span><b>No middleman checkout</b><span class="dot"></span><b>Brand keeps the customer</b></p>
-  </div>
-  <div class="machine">
-    <div class="machine-bar"><span>agent-readable record</span><span class="led"></span></div>
-    <pre>{e(pretty)}</pre>
-  </div>
-</div></section>
+<main id="main"><div class="wrap">
 
-<section class="sec-tight"><div class="wrap">
-  <div class="stats">
-    <div class="stat"><span class="n">{len(STORES)}</span><span class="l">Stores indexed</span></div>
-    <div class="stat"><span class="n">{len(PRODUCTS)}</span><span class="l">Listings published</span></div>
-    <div class="stat"><span class="n">{len(CATS)}</span><span class="l">Categories open</span></div>
-    <div class="stat"><span class="n">0%</span><span class="l">Commission we take</span></div>
-  </div>
-</div></section>
+  <p class="orient">
+    <b>{len(STORES)}</b> store{"s" if len(STORES)!=1 else ""}<span class="sep">/</span>
+    <b>{len(PRODUCTS)}</b> listing{"s" if len(PRODUCTS)!=1 else ""}<span class="sep">/</span>
+    <b>{len(live)}</b> of {len(CATS)} categories live<span class="sep">/</span>
+    compiled <b>{TODAY}</b><span class="sep">/</span>
+    commission taken <b>0%</b>
+  </p>
 
-<section class="sec" id="categories"><div class="wrap">
-  <div class="sec-head">
-    <div><p class="eyebrow alt">Browse</p><h2>Every category, independent only.</h2></div>
-    <a class="btn btn-sm btn-ghost" href="/stores/">All stores</a>
-  </div>
-  <div class="grid g6">{cat_tiles}</div>
-</div></section>
+  <section class="state">
+    <h1>Buy it from the people who make it.</h1>
+    <p>{e(BRAND)} is an index of independent online stores. Search it, find the thing, then buy on the seller's own site. We never handle the money, so nothing here is marked up to pay us and no listing is bought.</p>
+    <p class="sm muted">Every record is dated. Nothing is estimated. A store with no catalog connected shows no prices rather than invented ones.</p>
+    <span class="after">
+      <a href="#index">Browse the index</a>
+      <a href="/stores/">The register</a>
+      <a href="/for-brands/">List your brand</a>
+    </span>
+  </section>
 
-{listings_section}
+  <div class="rule" id="index"><h2>Index</h2><span class="n">{len(CATS)} categories</span>
+    <a class="more" href="/search/">Search \u2192</a></div>
+  <div class="index-list">{ix_live}</div>
 
-<section class="sec"><div class="wrap">
-  <div class="sec-head">
-    <div><p class="eyebrow alt">The index</p><h2>Stores on the record.</h2></div>
-  </div>
-  <div class="grid g3">{store_html}</div>
-</div></section>
+  <div class="rule"><h2>Open categories</h2><span class="n">no stores listed yet</span>
+    <a class="more" href="/join/">Apply \u2192</a></div>
+  <div class="index-list">{ix_open}</div>
 
-<section class="sec"><div class="wrap">
-  <div class="band">
-    <div class="grid g2" style="align-items:center;gap:30px">
-      <div>
-        <p class="eyebrow" style="color:#8E7BFF">For brands</p>
-        <h2>If a machine cannot read your store, it cannot recommend it.</h2>
-        <p>The crawlers behind AI assistants do not run JavaScript, do not log in and do not guess. They can only pass along what is written down in plain text, at a fixed address, with a date on it. Most independent stores have none of that. Building it is the whole job, and it costs {money(SITE["price_entry"])} a month.</p>
-        <a class="btn btn-lg" href="/for-brands/">See how it works</a>
-      </div>
-      <div class="machine" style="box-shadow:3px 3px 0 #000">
-        <div class="machine-bar"><span>what a crawler can and cannot read</span><span class="led"></span></div>
-        <pre>  <span class="s">+</span> a page it can fetch
-  <span class="s">+</span> prices written as text
-  <span class="s">+</span> a date on the record
-  <span class="s">+</span> pages elsewhere that cite you
-  <span class="k">×</span> a price inside a script
-  <span class="k">×</span> a spec sheet inside an image
-  <span class="k">×</span> a catalog behind a login</pre>
-      </div>
-    </div>
-  </div>
-</div></section>
-</main>
+  <div class="rule"><h2>Register</h2><span class="n">{len(STORES)} store{"s" if len(STORES)!=1 else ""} on the record</span>
+    <a class="more" href="/stores/">All \u2192</a></div>
+  <table class="register">
+    <thead><tr><th></th><th>Store</th><th>Categories</th><th>Ships to</th><th class="num">Listings</th><th class="num">State</th></tr></thead>
+    <tbody>{reg}</tbody>
+  </table>
+
+  <div class="rule"><h2>Listings</h2><span class="n">{len(PRODUCTS)} published</span>
+    <a class="more" href="/search/">Search all \u2192</a></div>
+  <div class="rows">{recent}</div>
+
+  <section class="ledge">
+    <h2>If a machine cannot read your store, it cannot recommend it.</h2>
+    <p>The crawlers behind AI assistants do not run JavaScript, do not log in and do not guess. They pass along what is written down in plain text, at a fixed address, with a date on it. Most independent stores publish none of that.</p>
+    <p>Building that record is the entire job here, and it costs {money(SITE["price_entry"])} a month with no contract.</p>
+    <span class="after"><a href="/for-brands/">Why this matters</a><a href="/pricing/">Pricing</a><a href="/join/">Apply to list</a></span>
+  </section>
+
+</div></main>
 {footer()}"""
-    return write("index.html", head(f"{BRAND} — {SITE['tagline']}",
-        "Search independent online stores and buy direct from the brand. No marketplace fees, no middleman checkout.",
+    return write("index.html", head(f"{BRAND} \u2014 {SITE['tagline']}",
+        "An index of independent online stores. Search real sellers and buy direct from the brand. No marketplace fees, no middleman checkout, no commission.",
         "/", ld=ld) + body)
 
 def page_category(c):
-    trail = [("Home","/"),("Categories","/#categories"),(c["name"],None)]
-    prods = c["products"]
+    trail = [("Home","/"),("Index","/#index"),(c["name"],None)]
+    prods  = c["products"]
     stores = c["stores"]
-    grid = "".join(product_card(p) for p in prods) if prods else open_slot(f"{c['name']} is open")
-    slist = "".join(store_card(s) for s in stores) if stores else open_slot("No stores listed yet")
-    other = "".join(f'<li><a href="/c/{o["slug"]}/"{" aria-current=\"page\"" if o["slug"]==c["slug"] else ""}>{e(o["name"])}</a></li>' for o in CATS)
-    subs = sorted({p.get("subcategory") for p in prods if p.get("subcategory")})
+    subs   = sorted({p.get("subcategory") for p in prods if p.get("subcategory")})
+    brands = sorted({p.get("brand") for p in prods if p.get("brand")})
+    prices = sorted(float(p["price"]) for p in prods if p.get("price"))
+
+    rows = "".join(listing_row(p) for p in prods) if prods else f"""<div class="slot">
+  <span class="tag tag-open">Open category</span>
+  <h3>No stores listed in {e(c["name"])} yet</h3>
+  <p>We are reviewing independent sellers for this category now. Nothing is listed here until a real store connects a real catalog.</p>
+  <a class="btn btn-sm btn-brand" href="/join/" style="align-self:flex-start">Apply to list</a>
+</div>"""
+
+    nav = "".join(
+        f'<a class="ix" href="/c/{o["slug"]}/"{" aria-current=\"page\"" if o["slug"]==c["slug"] else ""}>'
+        f'<span class="nm">{e(o["name"])}</span><span class="lead"></span>'
+        f'<span class="ct">{len([x for x in PRODUCTS if x.get("category")==o["slug"]]) or "\u2014"}</span></a>'
+        for o in CATS)
     subhtml = "".join(f'<label class="chk"><input type="checkbox" data-sub="{e(s)}"> {e(s)}</label>' for s in subs)
 
     ld = [ld_crumbs(trail),
-          {"@context":"https://schema.org","@type":"CollectionPage","name":f"{c['name']} — independent stores",
+          {"@context":"https://schema.org","@type":"CollectionPage","name":f"{c['name']} from independent stores",
            "url":f"{BASE}/c/{c['slug']}/","description":c["blurb"],
            "mainEntity":{"@type":"ItemList","numberOfItems":len(prods),
              "itemListElement":[{"@type":"ListItem","position":i+1,"url":p["url"],"name":p["title"]} for i,p in enumerate(prods)]}}]
 
+    band = (f'<span class="sep">/</span> <b>{money_mono(prices[0])}</b> to <b>{money_mono(prices[-1])}</b>' if prices else "")
     body = f"""{header(active=c["slug"])}
 {crumbs(trail)}
 <main id="main"><div class="wrap">
-  <div class="sec-head" style="margin-bottom:22px">
-    <div><p class="eyebrow">Category</p><h1>{e(c["name"])}</h1><p class="lede" style="margin:0">{e(c["blurb"])}</p></div>
-  </div>
-  <div class="shell">
+  <p class="orient"><b>{len(prods)}</b> listing{"s" if len(prods)!=1 else ""}<span class="sep">/</span>
+    <b>{len(stores)}</b> store{"s" if len(stores)!=1 else ""}<span class="sep">/</span>
+    <b>{len(subs)}</b> type{"s" if len(subs)!=1 else ""}{band}</p>
+
+  <section class="state" style="padding:30px 0 26px">
+    <h1>{e(c["name"])}</h1>
+    <p>{e(c["blurb"])}</p>
+  </section>
+
+  <div class="shell" style="margin-top:22px">
     <div>
-      <aside class="side">
-        <h4>Categories</h4>
-        <ul>{other}</ul>
-      </aside>
+      <aside class="side"><h4>Index</h4><div class="index-list" style="columns:1">{nav}</div></aside>
       {'<aside class="side"><h4>Type</h4>' + subhtml + '</aside>' if subhtml else ''}
-      <aside class="side">
-        <h4>Machine record</h4>
+      {'<aside class="side"><h4>Brands</h4><p class="sm muted" style="margin:0">' + e(", ".join(brands)) + '</p></aside>' if brands else ''}
+      <aside class="side"><h4>Machine record</h4>
         <p class="sm muted" style="margin:0 0 8px">This page is published as structured data and an open feed.</p>
-        <a class="btn btn-sm btn-ghost" href="/feeds/products.json">Product feed</a>
-      </aside>
+        <a class="btn btn-sm btn-ghost" href="/feeds/products.json">Product feed</a></aside>
     </div>
     <div>
-      <div class="bar">
-        <span class="count">{len(prods)} listing{"s" if len(prods)!=1 else ""} · {len(stores)} store{"s" if len(stores)!=1 else ""}</span>
-        <select id="sort" aria-label="Sort"><option value="rel">Sort: relevance</option><option value="lo">Price: low to high</option><option value="hi">Price: high to low</option></select>
-      </div>
-      <div class="grid g3" id="results">{grid}</div>
-
-      <div class="sec-head mt2" style="margin-top:36px"><div><p class="eyebrow alt">Stores</p><h2>Who sells in {e(c["name"])}</h2></div></div>
-      <div class="grid g2">{slist}</div>
+      <div class="rule" style="margin-top:0"><h2>Listings</h2><span class="n">{len(prods)} in {e(c["name"])}</span>
+        <select id="sort" class="more" aria-label="Sort" style="margin-left:auto">
+          <option value="rel">Order: as indexed</option>
+          <option value="lo">Price: low to high</option>
+          <option value="hi">Price: high to low</option></select></div>
+      <div class="rows" id="results">{rows}</div>
     </div>
   </div>
 </div></main>
 {footer()}"""
     return write(f"c/{c['slug']}/index.html",
-        head(f"{c['name']} from independent stores | {BRAND}", c["blurb"] + f" Browse {len(prods)} listings from independent sellers and buy direct.",
+        head(f"{c['name']} from independent stores | {BRAND}",
+             (c["blurb"] + f" {len(prods)} listings from independent sellers, bought direct from the brand.")[:158],
              f"/c/{c['slug']}/", ld=ld) + body)
 
 def page_store(s):
-    trail = [("Home","/"),("Stores","/stores/"),(s["name"],None)]
+    trail = [("Home","/"),("Register","/stores/"),(s["name"],None)]
     prods = [p for p in PRODUCTS if p["store"] == s["slug"]]
-    initials = "".join(w[0] for w in re.findall(r"[A-Za-z0-9]+", s["name"])[:2]).upper()
-    cats = ", ".join(CATBY[c]["name"] for c in s.get("categories", []) if c in CATBY)
-    grid = "".join(product_card(p) for p in prods) if prods else f"""<div class="slot">
+    cats  = ", ".join(CATBY[c]["name"] for c in s.get("categories", []) if c in CATBY)
+    subs  = sorted({p.get("subcategory") for p in prods if p.get("subcategory")})
+    brands = sorted({p.get("brand") for p in prods if p.get("brand")})
+    prices = sorted(float(p["price"]) for p in prods if p.get("price"))
+
+    rows = "".join(listing_row(p) for p in prods) if prods else f"""<div class="slot">
   <span class="tag">Catalog not connected</span>
   <h3>No product listings published yet</h3>
   <p>{e(s["name"])} has a listing on the index but has not connected a product feed, so we publish no prices or stock for it. Nothing here is estimated. Browse the catalog at the store itself.</p>
   <a class="btn btn-sm btn-brand" href="{e(s["url"])}" rel="nofollow noopener" target="_blank" style="align-self:flex-start">Open {e(s["name"])}</a>
 </div>"""
-    vals = "".join(f'<span class="tag">{e(v)}</span>' for v in s.get("values", []))
-    if s.get("summary"):
-        about_copy = e(s["summary"])
-    else:
-        about_copy = (f'{e(s["name"])} is an independent online store listed on the index in '
-                      f'{e(cats) or "a category"}. We publish the store name, its web address and the '
-                      f'categories it is indexed under. Everything else on this page is marked '
-                      f'<em>not verified</em> until the store confirms it, because we would rather '
-                      f'show you a blank than a guess.')
-    note = ""
-    if not s.get("verified"):
-        note = f"""<div class="note"><p class="sm"><b>Record status:</b> this listing holds only what we can confirm — the store name and its web address. We have not yet verified shipping, returns, currency or catalog with {e(s["name"])}, so those fields read <em>not verified</em> rather than being filled in with a guess. If you run this store, <a href="/join/">claim the page</a> and we will verify and date the record.</p></div>"""
+
+    pol = s.get("policy_urls") or {}
+    facts = [
+        ("Store", f'<a href="{e(s["url"])}" rel="nofollow noopener" target="_blank">{e(host(s["url"]))}</a>'),
+        ("Operated by", e(s.get("legal_name") or s["name"])),
+        ("Ships from", e(s.get("ships_from") or "Not verified")),
+        ("Ships to", e(", ".join(s.get("ships_to", [])) or "Not verified")),
+        ("Currency", e(s.get("currency") or "Not verified")),
+        ("Categories", e(cats)),
+        ("Types carried", e(", ".join(subs)) if subs else "Not verified"),
+        ("Brands carried", e(", ".join(brands)) if brands else "Not verified"),
+        ("Price range", f"{money_mono(prices[0])} to {money_mono(prices[-1])}" if prices else "No prices published"),
+        ("Listings published", str(len(prods))),
+        ("Returns", e(s.get("returns") or "Not verified") + (f' <a href="{e(pol["returns"])}" rel="nofollow noopener" target="_blank">Policy \u2192</a>' if pol.get("returns") else "")),
+        ("Record verified", e(s.get("verified") or "Pending")),
+    ]
+    spec = "".join(f"<div><dt>{k}</dt><dd>{v}</dd></div>" for k, v in facts)
+
+    note = "" if s.get("verified") else f"""<div class="note"><p class="sm"><b>Record status:</b> this listing holds only what we can confirm \u2014 the store name and its web address. Unconfirmed fields read <em>not verified</em> rather than being filled in with a guess. If you run this store, <a href="/join/">claim the page</a>.</p></div>"""
+
+    about = e(s["summary"]) if s.get("summary") else (
+        f'{e(s["name"])} is an independent online store indexed under {e(cats) or "the index"}. '
+        f'Fields we have not confirmed with the store read <em>not verified</em>, because we would rather show a blank than a guess.')
 
     ld = [ld_crumbs(trail),
           {k: v for k, v in {
              "@context":"https://schema.org","@type":"OnlineStore","name":s["name"],"url":s["url"],
              "@id":f"{BASE}/stores/{s['slug']}/#store","sameAs":[s["url"]],
+             "legalName": s.get("legal_name") or None,
              "description":s.get("summary") or None,
              "currenciesAccepted":s.get("currency") or None,
              "areaServed":s.get("ships_to") or None,
@@ -432,89 +452,93 @@ def page_store(s):
     body = f"""{header()}
 {crumbs(trail)}
 <main id="main"><div class="wrap">
-  <div class="sheet">
-    <div class="sheet-head">
-      <div class="sheet-logo">{e(initials)}</div>
-      <div>
-        <p class="eyebrow">Independent store</p>
-        <h1>{e(s["name"])}</h1>
-        <p class="lede" style="margin:0 0 .7rem">{e(s.get("tagline") or host(s["url"]))}</p>
-        <div class="flex">{vals}</div>
-      </div>
-      <div class="sheet-act">
-        <a class="btn btn-brand" href="{e(s["url"])}" rel="nofollow noopener" target="_blank">Visit store</a>
-        <a class="btn btn-ghost btn-sm" href="/join/">Claim this page</a>
-      </div>
-    </div>
-    <dl class="facts">
-      <div class="fact"><dt>Indexed since</dt><dd>{e(s.get("added") or TODAY)}</dd></div>
-      <div class="fact"><dt>Ships from</dt><dd>{e(s.get("ships_from") or "Not verified")}</dd></div>
-      <div class="fact"><dt>Listings published</dt><dd>{len(prods)}</dd></div>
-      <div class="fact"><dt>Verified</dt><dd>{e(s.get("verified") or "Pending")}</dd></div>
-    </dl>
-  </div>
-  {note}
-  <div class="grid g2" style="gap:26px;align-items:start">
-    <div>
-      <h2>About {e(s["name"])}</h2>
-      <p>{about_copy}</p>
-      <p class="rail"><b>Categories</b> {e(cats)}<span class="dot"></span>{status_tag(s)}<span class="dot"></span>{catalog_tag(s)}</p>
-    </div>
-    <div class="machine">
-      <div class="machine-bar"><span>this store's machine record</span><span class="led"></span></div>
-      <pre>{e(json.dumps({"name":s["name"],"url":s["url"],"categories":s.get("categories",[]),"listings":len(prods),"listing_status":s.get("listing_status","pending_verification"),"catalog_status":s.get("catalog_status","not_connected"),"last_verified":s.get("verified"),"feed":f"{BASE}/feeds/stores.json"}, indent=2))}</pre>
-    </div>
-  </div>
+  <p class="orient"><b>{len(prods)}</b> listing{"s" if len(prods)!=1 else ""}<span class="sep">/</span>
+    {("<b>verified</b> " + e(s["verified"])) if s.get("verified") else "<b>pending verification</b>"}<span class="sep">/</span>
+    catalog <b>{"connected" if s.get("catalog_status")=="connected" else "not connected"}</b><span class="sep">/</span>
+    commission taken <b>0%</b></p>
 
-  <div class="sec-head" style="margin-top:36px"><div><p class="eyebrow alt">Catalog</p><h2>{len(prods)} listing{"s" if len(prods)!=1 else ""}</h2></div>
-    <span class="rail">{catalog_tag(s)}</span></div>
-  <div class="grid {"g4" if prods else "g1"}">{grid}</div>
-  <p class="sm muted mt2">Every link goes straight to {e(s["name"])}. {BRAND} takes no commission and handles no payment.</p>
+  <section class="state" style="padding:30px 0 26px">
+    <h1>{e(s["name"])}</h1>
+    <p>{about}</p>
+    <span class="after">
+      <a href="{e(s["url"])}" rel="nofollow noopener" target="_blank">Visit {e(host(s["url"]))} \u2192</a>
+      <a href="/join/">Claim this page</a>
+    </span>
+  </section>
+  {note}
+
+  <div class="rule"><h2>Record</h2><span class="n">what we publish, and what we have not confirmed</span>
+    <a class="more" href="/feeds/stores.json">Feed \u2192</a></div>
+  <dl class="spec">{spec}</dl>
+
+  <div class="rule"><h2>Listings</h2><span class="n">{len(prods)} published</span></div>
+  <div class="rows">{rows}</div>
+  <p class="sm muted" style="margin-top:14px">Every link goes straight to {e(s["name"])}. {BRAND} takes no commission, handles no payment and sells no placement. Prices and stock are read from the store's own public catalog and dated; check the store for the live figure before you buy.</p>
 </div></main>
 {footer()}"""
     return write(f"stores/{s['slug']}/index.html",
-        head(f"{s['name']} — independent store | {BRAND}",
-             (s.get("summary") or f"{s['name']} is an independent online store at {host(s['url'])}, indexed under {cats or 'the index'}. Buy direct from the brand.")[:158],
+        head(f"{s['name']} \u2014 independent store | {BRAND}",
+             (s.get("summary") or f"{s['name']} is an independent online store at {host(s['url'])}, indexed under {cats or 'the index'}.")[:158],
              f"/stores/{s['slug']}/", ld=ld) + body)
 
 def page_stores():
-    trail = [("Home","/"),("Stores",None)]
-    cards = "".join(store_card(s) for s in STORES) + open_slot("Your brand here")
-    ld = [ld_crumbs(trail), {"@context":"https://schema.org","@type":"CollectionPage","name":"All stores","url":BASE+"/stores/",
+    trail = [("Home","/"),("Register",None)]
+    reg = "".join(register_row(i + 1, s) for i, s in enumerate(STORES))
+    ld = [ld_crumbs(trail), {"@context":"https://schema.org","@type":"CollectionPage","name":"Register of independent stores","url":BASE+"/stores/",
           "mainEntity":{"@type":"ItemList","numberOfItems":len(STORES),
             "itemListElement":[{"@type":"ListItem","position":i+1,"url":f"{BASE}/stores/{s['slug']}/","name":s["name"]} for i,s in enumerate(STORES)]}}]
     body = f"""{header()}
 {crumbs(trail)}
 <main id="main"><div class="wrap">
-  <div class="sec-head"><div><p class="eyebrow">The index</p><h1>Every store on the record</h1>
-    <p class="lede" style="margin:0">Independent sellers only. Each one keeps its own checkout, its own customers and its own margin.</p></div></div>
-  <div class="bar"><span class="count">{len(STORES)} store{"s" if len(STORES)!=1 else ""} · verified {TODAY}</span>
-    <a class="btn btn-sm btn-brand" href="/join/">Apply to list</a></div>
-  <div class="grid g3">{cards}</div>
+  <p class="orient"><b>{len(STORES)}</b> store{"s" if len(STORES)!=1 else ""} on the record<span class="sep">/</span>
+    <b>{len(PRODUCTS)}</b> listing{"s" if len(PRODUCTS)!=1 else ""}<span class="sep">/</span>compiled <b>{TODAY}</b></p>
+  <section class="state" style="padding:30px 0 26px">
+    <h1>The register</h1>
+    <p>Every store on the index, with what it sells, where it ships and when we last checked. Independent sellers only: each one keeps its own checkout, its own customers and its own margin.</p>
+    <span class="after"><a href="/join/">Apply to list</a><a href="/feeds/stores.json">Store feed</a></span>
+  </section>
+  <div class="rule"><h2>Stores</h2><span class="n">alphabetical by entry</span></div>
+  <table class="register">
+    <thead><tr><th></th><th>Store</th><th>Categories</th><th>Ships to</th><th class="num">Listings</th><th class="num">State</th></tr></thead>
+    <tbody>{reg}</tbody>
+  </table>
+  <section class="ledge">
+    <h2>Your brand belongs on this list.</h2>
+    <p>Hand-checked, month to month, no commission and no checkout between you and your customer.</p>
+    <span class="after"><a href="/for-brands/">Why list here</a><a href="/pricing/">Pricing</a><a href="/join/">Apply</a></span>
+  </section>
 </div></main>
 {footer()}"""
-    return write("stores/index.html", head(f"All independent stores | {BRAND}",
-        "The full index of verified independent online stores. Buy direct from the brand.", "/stores/", ld=ld) + body)
+    return write("stores/index.html", head(f"Register of independent stores | {BRAND}",
+        "Every verified independent store on the index, with categories, shipping and verification date. Buy direct from the brand.", "/stores/", ld=ld) + body)
 
 def page_search():
     trail = [("Home","/"),("Search",None)]
     body = f"""{header()}
 {crumbs(trail)}
 <main id="main"><div class="wrap">
-  <h1>Search</h1>
-  <p class="lede">Search every listing in the index. Results link straight to the brand's own store.</p>
-  <form class="find" action="/search/" method="get" role="search" style="max-width:640px;margin:18px 0 26px">
-    <input id="q2" name="q" type="search" placeholder="Try: shower door, phone case, coffee" autocomplete="off">
-    <button type="submit">Search</button>
-  </form>
-  <div class="bar"><span class="count" id="rcount">Type to search</span>
-    <select id="sort2" aria-label="Sort"><option value="rel">Sort: relevance</option><option value="lo">Price: low to high</option><option value="hi">Price: high to low</option></select></div>
-  <div class="grid g4" id="results"></div>
-  <p class="muted sm mt2" id="empty">Nothing matched. Try a broader word, or <a href="/stores/">browse all stores</a>.</p>
+  <p class="orient"><b>{len(PRODUCTS)}</b> listing{"s" if len(PRODUCTS)!=1 else ""} searchable<span class="sep">/</span>
+    <b>{len(STORES)}</b> store{"s" if len(STORES)!=1 else ""}<span class="sep">/</span>results link straight to the seller</p>
+  <section class="state" style="padding:30px 0 22px">
+    <h1>Search the index</h1>
+    <p>One query across every independent store on the record. Results go to the seller's own site \u2014 there is no checkout here.</p>
+    <form class="find" action="/search/" method="get" role="search" style="max-width:640px;margin:18px 0 0">
+      <label class="sr" for="q2">Search listings</label>
+      <input id="q2" name="q" type="search" placeholder="shower pan, sauna, cold plunge, steam generator" autocomplete="off">
+      <button type="submit">Search</button>
+    </form>
+  </section>
+  <div class="rule"><h2>Results</h2><span class="n" id="rcount">Type to search</span>
+    <select id="sort2" class="more" aria-label="Sort" style="margin-left:auto">
+      <option value="rel">Order: relevance</option>
+      <option value="lo">Price: low to high</option>
+      <option value="hi">Price: high to low</option></select></div>
+  <div class="rows" id="results"></div>
+  <p class="muted sm" style="margin-top:14px" id="empty">Nothing matched. Try a broader word, or <a href="/stores/">browse the register</a>.</p>
 </div></main>
 {footer()}"""
     return write("search/index.html", head(f"Search independent stores | {BRAND}",
-        "Search products across every independent store in the index.", "/search/",
+        "Search listings across every independent store on the index.", "/search/",
         extra='<meta name="robots" content="noindex, follow">', ld=ld_crumbs(trail)) + body)
 
 def page_for_brands():
@@ -862,7 +886,8 @@ Attribution: {BRAND} ({BASE}).
     # search index
     idx = [{"t": p["title"], "u": p["url"], "p": p["price"], "c": p.get("currency","USD"),
             "s": STOREBY.get(p["store"],{}).get("name",""), "sl": p["store"],
-            "cat": p.get("category"), "sub": p.get("subcategory",""), "sku": p.get("sku","")} for p in PRODUCTS]
+            "cat": p.get("category"), "sub": p.get("subcategory",""), "sku": p.get("sku",""),
+            "b": p.get("brand",""), "img": p.get("image"), "d": p.get("dimensions"), "f": p.get("finish")} for p in PRODUCTS]
     out.append(write("search-index.json", json.dumps({"generated": TODAY, "items": idx}, separators=(",",":"))))
 
     out.append(write(".well-known/mcp/server.json", json.dumps({

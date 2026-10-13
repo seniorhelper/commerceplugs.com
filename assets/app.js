@@ -6,7 +6,7 @@
 (function () {
   "use strict";
 
-  var INDEX_URL = "/search-index.json";
+  var INDEX_URL = (window.CP_INDEX || "/search-index.json");
   var cache = null;
 
   function $(s, r) { return (r || document).querySelector(s); }
@@ -31,15 +31,25 @@
   }
 
   function card(it) {
-    var price = it.p ? '<p class="price">' + money(it.p) + " <span>" + esc(it.c || "USD") + "</span></p>" : "";
-    return '<article class="card card-hover prod">' +
-      '<div class="shot"><span class="ph">' + esc(it.sku || "") + "</span></div>" +
-      '<h3><a href="' + esc(it.u) + '" rel="nofollow noopener" target="_blank">' + esc(it.t) + "</a></h3>" +
-      '<p class="from">from <a href="/stores/' + esc(it.sl) + '/">' + esc(it.s) + "</a></p>" +
-      price +
-      '<p class="rail"><b>In stock</b><span class="dot"></span>' + esc(it.sub || "") + "</p>" +
-      '<a class="btn btn-sm btn-brand mt2" href="' + esc(it.u) + '" rel="nofollow noopener" target="_blank">Buy at ' + esc(it.s) + "</a>" +
-      "</article>";
+    var img = it.img
+      ? '<img src="' + esc(it.img) + '" alt="" loading="lazy" decoding="async">'
+      : '<span class="sm muted">' + esc((it.sku || "").slice(0, 6)) + "</span>";
+    var bits = [];
+    if (it.b) bits.push("<b>" + esc(it.b) + "</b>");
+    if (it.sub) bits.push(esc(it.sub));
+    if (it.d) bits.push(esc(it.d));
+    if (it.f) bits.push(esc(it.f));
+    bits.push("in stock");
+    if (it.sku) bits.push(esc(it.sku));
+    return '<div class="row">' +
+      '<span class="th">' + img + "</span>" +
+      "<div>" +
+        '<a class="ttl" href="' + esc(it.u) + '" rel="nofollow noopener" target="_blank">' + esc(it.t) + "</a>" +
+        '<p class="meta">' + bits.join('<span class="sep">\u00b7</span>') + "</p>" +
+      "</div>" +
+      '<div class="amt"><span class="p">' + money(it.p) + "</span>" +
+        '<a class="go" href="' + esc(it.u) + '" rel="nofollow noopener" target="_blank">' + esc(it.s) + " \u2192</a></div>" +
+      "</div>";
   }
 
   function score(it, terms) {
@@ -126,7 +136,7 @@
     var box = $("#results");
     var sel = $("#sort");
     if (!box) return;
-    var cards = $$(".prod", box);
+    var cards = $$(".row", box);
     if (!cards.length) return;
 
     function priceOf(el) {
@@ -134,7 +144,7 @@
       return t ? parseFloat(t.textContent.replace(/[^0-9.]/g, "")) : 0;
     }
     function subOf(el) {
-      var r = $(".rail", el);
+      var r = $(".meta", el);
       if (!r) return "";
       var parts = r.textContent.split("·");
       return (parts[parts.length - 1] || "").trim();

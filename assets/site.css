@@ -498,3 +498,127 @@ img, svg { max-width: 100%; height: auto; }
 }
 
 .g1 { grid-template-columns: 1fr; }
+
+/* ============================================================
+   INDEX GRAMMAR
+   The site is a reference work, not a landing page. These are
+   the primitives that replace hero / stat-cells / icon-cards /
+   dark-band: ruled rows, dot leaders, registers, mono counts.
+   Type and rules do the work. Nothing floats in a box.
+   ============================================================ */
+
+/* --- the orientation line: one dense mono line, no hero --- */
+.orient {
+  font: 500 .72rem var(--mono); letter-spacing: .1em; text-transform: uppercase;
+  color: var(--muted); padding: 14px 0; border-bottom: 2px solid var(--ink);
+  display: flex; flex-wrap: wrap; gap: 0 10px; align-items: baseline;
+}
+.orient b { color: var(--ink); font-weight: 600; }
+.orient .sep { color: var(--line-2); }
+
+/* --- the statement block: type only, no buttons floating beside it --- */
+.state { padding: 42px 0 36px; border-bottom: 2px solid var(--ink); }
+.state h1 {
+  font-size: clamp(2rem, 6.2vw, 4.4rem); line-height: .97; letter-spacing: -.045em;
+  margin: 0 0 1.1rem; max-width: 18ch;
+}
+.state p { font-size: 1.08rem; color: var(--ink-2); max-width: 54ch; margin: 0 0 .8rem; }
+.state .after { display: flex; flex-wrap: wrap; gap: 0 22px; margin-top: 1.3rem; }
+.state .after a {
+  font: 500 .86rem var(--sans); border-bottom: 2px solid var(--brand);
+  padding-bottom: 1px; color: var(--ink);
+}
+.state .after a:hover { background: var(--brand); color: #fff; text-decoration: none; }
+@media (max-width: 560px) { .state { padding: 28px 0 24px; } }
+
+/* --- section rule: a label on a line, not a card header --- */
+.rule {
+  display: flex; align-items: baseline; gap: 12px; margin: 34px 0 0;
+  border-bottom: 2px solid var(--ink); padding-bottom: 7px;
+}
+.rule h2 { font: 600 .78rem var(--mono); letter-spacing: .16em; text-transform: uppercase; margin: 0; }
+.rule .n { font: 400 .72rem var(--mono); color: var(--muted); letter-spacing: .08em; }
+.rule .more { margin-left: auto; font: 500 .76rem var(--mono); letter-spacing: .08em; text-transform: uppercase; }
+
+/* --- the index proper: dot-leader list, newspaper columns --- */
+.index-list { columns: 3; column-gap: 40px; column-rule: 1px solid var(--line); padding: 6px 0 0; }
+@media (max-width: 900px) { .index-list { columns: 2; column-gap: 26px; } }
+@media (max-width: 560px) { .index-list { columns: 1; } }
+.ix {
+  display: flex; align-items: baseline; gap: 6px; padding: .46rem 0;
+  break-inside: avoid; border-bottom: 1px solid var(--line);
+  color: var(--ink); font-size: .95rem;
+}
+.ix:hover { text-decoration: none; color: var(--brand); }
+.ix:hover .lead { border-color: var(--brand); }
+.ix .nm { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.ix .lead { flex: 1; border-bottom: 1px dotted var(--line-2); transform: translateY(-3px); min-width: 14px; }
+.ix .ct { font: 500 .8rem var(--mono); color: var(--muted); font-variant-numeric: tabular-nums; }
+.ix:hover .ct { color: var(--brand); }
+
+/* --- register: stores as ruled table rows, not cards --- */
+.register { width: 100%; border-collapse: collapse; font-size: .92rem; }
+.register th {
+  text-align: left; font: 500 .68rem var(--mono); letter-spacing: .12em; text-transform: uppercase;
+  color: var(--muted); padding: 10px 12px 8px 0; border-bottom: 1px solid var(--line);
+}
+.register td { padding: 14px 12px 14px 0; border-bottom: 1px solid var(--line); vertical-align: top; }
+.register tr:hover td { background: var(--surface); }
+.register .ix-n { font: 500 .8rem var(--mono); color: var(--muted); font-variant-numeric: tabular-nums; width: 1%; }
+.register .nm a { font-weight: 600; font-size: 1rem; }
+.register .dom { font: 400 .78rem var(--mono); color: var(--muted); display: block; margin-top: 2px; }
+.register .num { font: 500 .85rem var(--mono); font-variant-numeric: tabular-nums; text-align: right; }
+@media (max-width: 760px) {
+  .register thead { display: none; }
+  .register, .register tbody, .register tr, .register td { display: block; width: 100%; }
+  .register tr { border-bottom: 2px solid var(--ink); padding: 12px 0; }
+  .register td { border: 0; padding: 2px 0; }
+  .register .num { text-align: left; }
+}
+
+/* --- listing rows: a trade price list, not a card grid --- */
+.rows { border-top: 2px solid var(--ink); }
+.row {
+  display: grid; grid-template-columns: 74px 1fr auto; gap: 16px;
+  padding: 14px 0; border-bottom: 1px solid var(--line); align-items: start;
+}
+.row:hover { background: var(--surface); }
+.row .th {
+  width: 74px; height: 74px; border: 1px solid var(--line); background: var(--paper);
+  display: grid; place-items: center; overflow: hidden; border-radius: 2px;
+}
+.row .th img { width: 100%; height: 100%; object-fit: contain; mix-blend-mode: multiply; }
+.row .ttl { font-weight: 500; font-size: .98rem; line-height: 1.35; display: block; margin-bottom: .3rem; }
+.row .ttl:hover { color: var(--brand); }
+.row .meta {
+  font: 400 .76rem var(--mono); color: var(--muted); letter-spacing: .02em;
+  display: flex; flex-wrap: wrap; gap: 0 8px;
+}
+.row .meta b { color: var(--ink-2); font-weight: 500; }
+.row .desc { font-size: .86rem; color: var(--ink-2); margin: .35rem 0 0; max-width: 70ch; }
+.row .amt { text-align: right; white-space: nowrap; }
+.row .amt .p { font: 600 1.05rem var(--mono); font-variant-numeric: tabular-nums; display: block; letter-spacing: -.02em; }
+.row .amt .go { font: 500 .72rem var(--mono); letter-spacing: .08em; text-transform: uppercase; color: var(--brand); }
+.row .amt .go:hover { text-decoration: underline; }
+@media (max-width: 620px) {
+  .row { grid-template-columns: 56px 1fr; }
+  .row .th { width: 56px; height: 56px; }
+  .row .amt { grid-column: 2; text-align: left; margin-top: .3rem; }
+  .row .amt .p { display: inline; margin-right: 10px; }
+  .row .desc { display: none; }
+}
+
+/* --- a plain ruled note, replaces the dark band --- */
+.ledge { border-top: 2px solid var(--ink); border-bottom: 2px solid var(--ink); padding: 26px 0; margin: 40px 0 0; }
+.ledge h2 { font-size: clamp(1.4rem, 3vw, 2rem); letter-spacing: -.03em; margin: 0 0 .6rem; max-width: 26ch; }
+.ledge p { color: var(--ink-2); max-width: 62ch; margin: 0 0 .5rem; }
+.ledge .after { margin-top: 1rem; display: flex; gap: 0 22px; flex-wrap: wrap; }
+.ledge .after a { font: 500 .86rem var(--sans); border-bottom: 2px solid var(--brand); padding-bottom: 1px; color: var(--ink); }
+.ledge .after a:hover { background: var(--brand); color: #fff; text-decoration: none; }
+
+/* --- spec list: facts as ruled definition rows --- */
+.spec { border-top: 1px solid var(--line); margin: 0; }
+.spec div { display: grid; grid-template-columns: 180px 1fr; gap: 16px; padding: 11px 0; border-bottom: 1px solid var(--line); }
+.spec dt { font: 500 .7rem var(--mono); letter-spacing: .1em; text-transform: uppercase; color: var(--muted); padding-top: 2px; }
+.spec dd { margin: 0; font-size: .95rem; }
+@media (max-width: 620px) { .spec div { grid-template-columns: 1fr; gap: 2px; } }
