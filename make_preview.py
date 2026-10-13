@@ -9,9 +9,10 @@ import os, re, shutil, sys
 
 ROOT = os.path.dirname(os.path.abspath(__file__))
 OUT  = os.path.join(ROOT, "preview")
-COPY = ["assets", "feeds", ".well-known", "c", "stores", "search", "for-brands",
-        "pricing", "how-it-works", "join", "about", "index.html", "404.html",
-        "search-index.json", "llms.txt", "sitemap.xml", "robots.txt"]
+COPY = ["assets", "feeds", ".well-known", "c", "t", "b", "stores", "search",
+        "contents", "for-brands", "pricing", "how-it-works", "join", "about",
+        "index.html", "404.html", "search-index.json", "llms.txt", "sitemap.xml",
+        "robots.txt"]
 
 def depth_prefix(rel):
     d = rel.count(os.sep)
