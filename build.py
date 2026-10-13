@@ -23,6 +23,23 @@ for c in CATS:
     c["stores"] = [s for s in STORES if c["slug"] in s.get("categories", [])]
     c["products"] = [p for p in PRODUCTS if p.get("category") == c["slug"]]
 
+def slug(t):
+    out = re.sub(r"[^a-z0-9]+", "-", str(t).lower()).strip("-")
+    return out or "other"
+
+# A directory is only as good as the ways into it. Beyond the 16 editorial
+# categories we index every product type and every brand carried, so a shopper
+# or a crawler can enter at "cold plunge tub" or "Bestbath" rather than only at
+# "Home & Bath".
+TYPES, BRANDS = {}, {}
+for p in PRODUCTS:
+    if p.get("subcategory"):
+        TYPES.setdefault(slug(p["subcategory"]), {"name": p["subcategory"], "items": []})["items"].append(p)
+    if p.get("brand"):
+        BRANDS.setdefault(slug(p["brand"]), {"name": p["brand"], "items": []})["items"].append(p)
+TYPES  = dict(sorted(TYPES.items(),  key=lambda kv: (-len(kv[1]["items"]), kv[1]["name"])))
+BRANDS = dict(sorted(BRANDS.items(), key=lambda kv: (-len(kv[1]["items"]), kv[1]["name"])))
+
 e = lambda t: html.escape(str(t if t is not None else ""), quote=True)
 # Line icons drawn on a 24x24 grid, 1.6 stroke, currentColor. Inline so they
 # cost no request and inherit the brand colour in both themes.
@@ -83,9 +100,9 @@ def head(title, desc, path, extra="", ld=None):
 <meta property="og:url" content="{url}">
 <meta property="og:type" content="website">
 <meta name="twitter:card" content="summary_large_image">
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@400;500;600&family=Space+Grotesk:wght@500;700&display=swap">
+<link rel="preload" href="/assets/fonts/Newsreader-normal-400-5.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="/assets/fonts/Archivo-normal-400-1.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="stylesheet" href="/assets/fonts.css">
 <link rel="stylesheet" href="/assets/site.css">
 <script src="/assets/app.js" defer></script>
 <link rel="alternate" type="application/json" href="{BASE}/feeds/products.json" title="Product feed">
@@ -110,7 +127,7 @@ def header(active=None):
     <button type="submit">Search</button>
   </form>
   <nav class="top-act" aria-label="Account">
-    <a class="no-sm" href="/stores/">Stores</a>
+    <a class="no-sm" href="/contents/">Contents</a>\n    <a class="no-sm" href="/stores/">Stores</a>
     <a class="no-sm" href="/how-it-works/">How it works</a>
     <a class="cta" href="/for-brands/">List your brand</a>
   </nav>
@@ -124,7 +141,7 @@ def header(active=None):
 def footer():
     cols = ""
     for group, links in [
-        ("Shop", [("All stores","/stores/"),("Categories","/#categories"),("Search","/search/"),("Recently added","/stores/")]),
+        ("Shop", [("Contents","/contents/"),("All stores","/stores/"),("Search","/search/"),("Recently added","/stores/")]),
         ("For brands", [("Why list here","/for-brands/"),("Pricing","/pricing/"),("How it works","/how-it-works/"),("Get listed","/join/")]),
         ("Machine", [("Store feed","/feeds/stores.json"),("Product feed","/feeds/products.json"),("MCP server","/.well-known/mcp/server.json"),("llms.txt","/llms.txt")]),
         ("Company", [("About","/about/"),("Contact","/join/"),("Sitemap","/sitemap.xml"),("Publisher",SITE["publisher_url"])]),
@@ -186,8 +203,8 @@ def listing_row(p):
     img = (f'<img src="{e(p["image"])}" alt="" loading="lazy" decoding="async">'
            if p.get("image") else f'<span class="sm muted">{e((p.get("sku") or "")[:6])}</span>')
     bits = []
-    if p.get("brand"): bits.append(f'<b>{e(p["brand"])}</b>')
-    if p.get("subcategory"): bits.append(e(p["subcategory"]))
+    if p.get("brand"): bits.append(f'<a href="/b/{slug(p["brand"])}/"><b>{e(p["brand"])}</b></a>')
+    if p.get("subcategory"): bits.append(f'<a href="/t/{slug(p["subcategory"])}/">{e(p["subcategory"])}</a>')
     if p.get("dimensions"): bits.append(e(p["dimensions"]))
     if p.get("finish"): bits.append(e(p["finish"]))
     bits.append("in stock" if p.get("availability") == "in_stock" else e(p.get("availability", "")))
@@ -613,7 +630,7 @@ def page_for_brands():
     </div>
   </div>
 
-  <div class="note"><p><b>What we will not claim:</b> we cannot promise you a citation in ChatGPT, a ranking in Google, or a sale. What we can promise is that every fact about you is published in a form a machine can fetch, parse and date &mdash; and that is the part that is currently missing. Anyone selling you the guarantee is selling you something they do not control.</p></div>
+  <div class="note"><p><b>What we will not claim:</b> we cannot promise you a citation in any assistant, a search ranking, or a sale. What we can promise is that every fact about you is published in a form a machine can fetch, parse and date &mdash; and that is the part that is currently missing. Anyone selling you the guarantee is selling you something they do not control.</p></div>
 
   <div class="band mt2">
     <h2>{money(SITE["price_entry"])} a month. Cancel whenever.</h2>
@@ -637,12 +654,12 @@ def page_pricing():
             ("Merchant feed syndication", 0), ("Custom skin and colours", 0)]),
         ("Pro", 49, "per month", True, [
             ("Everything in Index", 1), ("Up to 250 product listings", 1),
-            ("Feed syndication to Microsoft and Google Merchant Center", 1), ("Your record exposed through our MCP server", 1),
+            ("Feed syndication to the major merchant feed programs", 1), ("Your record exposed through our MCP server", 1),
             ("Priority placement in your categories", 1), ("Monthly visibility report: who cites you, and for what", 1),
             ("Colour, logo and skin controls", 1), ("Catalog auto-sync", 0)]),
         ("Signal", 149, "per month", False, [
             ("Everything in Pro", 1), ("Unlimited listings with nightly catalog sync", 1),
-            ("ChatGPT merchant feed application handled for you", 1), ("Answer monitoring across four assistants", 1),
+            ("Merchant feed applications applied for on your behalf", 1), ("Answer monitoring across the major assistants", 1),
             ("Custom skin, or bring your own HTML", 1), ("Quarterly machine-readability audit of your own store", 1),
             ("Named contact, same-day support", 1), ("Fully managed, nothing for you to do", 1)]),
     ]
@@ -829,6 +846,115 @@ def page_404():
     return write("404.html", head(f"Not found | {BRAND}", "Page not found.", "/404.html",
         extra='<meta name="robots" content="noindex, follow">') + body)
 
+def page_facet(kind, key, rec):
+    """One page per product type (/t/) or brand (/b/). Same shape, different axis."""
+    items = rec["items"]
+    name  = rec["name"]
+    label = "Type" if kind == "t" else "Brand"
+    base  = "/t/" if kind == "t" else "/b/"
+    others = TYPES if kind == "t" else BRANDS
+    trail = [("Home","/"),("Index","/#index"),(name,None)]
+
+    prices = sorted(float(i["price"]) for i in items if i.get("price"))
+    stores = sorted({STOREBY.get(i["store"],{}).get("name", i["store"]) for i in items})
+    cross  = sorted({(i.get("brand") if kind=="t" else i.get("subcategory")) for i in items if (i.get("brand") if kind=="t" else i.get("subcategory"))})
+    cats   = sorted({CATBY[i["category"]]["name"] for i in items if i.get("category") in CATBY})
+    rows   = "".join(listing_row(i) for i in items)
+
+    CUR = ' aria-current="page"'
+    nav = "".join(
+        f'<a class="ix" href="{base}{k}/"{CUR if k == key else ""}>'
+        f'<span class="nm">{e(v["name"])}</span><span class="lead"></span>'
+        f'<span class="ct">{len(v["items"])}</span></a>' for k, v in others.items())
+
+    if kind == "t":
+        lede = (f"Every {name.lower()} on the index, from every independent store listed. "
+                f"Prices and specifications are read from each seller's own catalog and dated. "
+                f"Buying happens on their site, not here.")
+        crosslabel, crossbase = "Brands in this type", "/b/"
+    else:
+        lede = (f"Everything by {name} carried by independent stores on the index. "
+                f"We are not {name} and we do not sell it \u2014 we record who does, "
+                f"so you can buy from a real seller rather than guess.")
+        crosslabel, crossbase = "Types carried", "/t/"
+    crosshtml = " \u00b7 ".join(f'<a href="{crossbase}{slug(x)}/">{e(x)}</a>' for x in cross)
+
+    ld = [ld_crumbs(trail),
+          {"@context":"https://schema.org","@type":"CollectionPage","name":f"{name} \u2014 {BRAND}",
+           "url":f"{BASE}{base}{key}/","description":lede,
+           "mainEntity":{"@type":"ItemList","numberOfItems":len(items),
+             "itemListElement":[{"@type":"ListItem","position":i+1,"url":x["url"],"name":x["title"]}
+                                for i,x in enumerate(items)]}}]
+
+    body = f"""{header()}
+{crumbs(trail)}
+<main id="main"><div class="wrap">
+  <p class="orient"><b>{len(items)}</b> listing{"s" if len(items)!=1 else ""}<span class="sep">/</span>
+    <b>{len(stores)}</b> store{"s" if len(stores)!=1 else ""}
+    {f'<span class="sep">/</span> <b>{money_mono(prices[0])}</b> to <b>{money_mono(prices[-1])}</b>' if prices else ""}
+    <span class="sep">/</span>compiled <b>{TODAY}</b></p>
+
+  <section class="state" style="padding:32px 0 26px">
+    <p class="label">{label}</p>
+    <h1>{e(name)}</h1>
+    <p>{lede}</p>
+  </section>
+
+  <div class="shell" style="margin-top:22px">
+    <div>
+      <aside class="side"><h4>All {("types" if kind=="t" else "brands")}</h4>
+        <div class="index-list" style="columns:1">{nav}</div></aside>
+      <aside class="side"><h4>{crosslabel}</h4><p class="sm" style="margin:0">{crosshtml}</p></aside>
+      <aside class="side"><h4>Categories</h4><p class="sm" style="margin:0">{e(", ".join(cats))}</p></aside>
+      <aside class="side"><h4>Sold by</h4><p class="sm" style="margin:0">{e(", ".join(stores))}</p></aside>
+    </div>
+    <div>
+      <div class="rule" style="margin-top:0"><h2>Listings</h2><span class="n">{len(items)} under {e(name)}</span>
+        <select id="sort" class="more" aria-label="Sort" style="margin-left:auto">
+          <option value="rel">Order: as indexed</option>
+          <option value="lo">Price: low to high</option>
+          <option value="hi">Price: high to low</option></select></div>
+      <div class="rows" id="results">{rows}</div>
+    </div>
+  </div>
+</div></main>
+{footer()}"""
+    return write(f"{base.strip('/')}/{key}/index.html",
+        head(f"{name} from independent stores | {BRAND}", lede[:158], f"{base}{key}/", ld=ld) + body)
+
+def page_indexes():
+    """A contents page listing every way into the index."""
+    trail = [("Home","/"),("Contents",None)]
+    def block(title, base, coll):
+        return (f'<div class="rule"><h2>{title}</h2><span class="n">{len(coll)} entries</span></div>'
+                '<div class="index-list">' +
+                "".join(index_entry(v["name"], f'{base}{k}/', len(v["items"])) for k, v in coll.items()) +
+                "</div>")
+    cat_block = ('<div class="rule" style="margin-top:0"><h2>Categories</h2>'
+                 f'<span class="n">{len(CATS)} entries</span></div><div class="index-list">' +
+                 "".join(index_entry(c["name"], f'/c/{c["slug"]}/',
+                                     len([p for p in PRODUCTS if p.get("category")==c["slug"]]) or "\u2014")
+                         for c in CATS) + "</div>")
+    body = f"""{header()}
+{crumbs(trail)}
+<main id="main"><div class="wrap">
+  <p class="orient"><b>{len(CATS)}</b> categories<span class="sep">/</span>
+    <b>{len(TYPES)}</b> types<span class="sep">/</span><b>{len(BRANDS)}</b> brands<span class="sep">/</span>
+    <b>{len(STORES)}</b> store{"s" if len(STORES)!=1 else ""}<span class="sep">/</span>compiled <b>{TODAY}</b></p>
+  <section class="state" style="padding:32px 0 26px">
+    <p class="label">Contents</p>
+    <h1>Every way into the index.</h1>
+    <p>Browse by editorial category, by product type as the sellers themselves classify it, or by the brand that made the thing. Counts are literal: a dash means nothing is listed under that heading yet.</p>
+  </section>
+  {cat_block}
+  {block("Product types", "/t/", TYPES)}
+  {block("Brands carried", "/b/", BRANDS)}
+</div></main>
+{footer()}"""
+    return write("contents/index.html", head(f"Contents \u2014 every category, type and brand | {BRAND}",
+        f"The full contents of the index: {len(CATS)} categories, {len(TYPES)} product types and {len(BRANDS)} brands carried by independent stores.",
+        "/contents/", ld=ld_crumbs(trail)) + body)
+
 # ---------------------------------------------------------------- machine
 def machine_files():
     out = []
@@ -945,6 +1071,8 @@ Sitemap: {BASE}/sitemap.xml
 """))
 
     cat_lines = "\n".join(f"- [{c['name']}]({BASE}/c/{c['slug']}/): {c['blurb']}" for c in CATS)
+    type_lines = "\n".join(f"- [{v['name']}]({BASE}/t/{k}/): {len(v['items'])} listings" for k, v in TYPES.items()) or "- None yet."
+    brand_lines = "\n".join(f"- [{v['name']}]({BASE}/b/{k}/): {len(v['items'])} listings" for k, v in BRANDS.items()) or "- None yet."
     store_lines = "\n".join(
         f"- [{s['name']}]({BASE}/stores/{s['slug']}/) — independent store, sells direct at {s['url']}. "
         f"Categories: {', '.join(CATBY[c]['name'] for c in s.get('categories',[]) if c in CATBY) or 'unclassified'}. "
@@ -969,6 +1097,12 @@ Sitemap: {BASE}/sitemap.xml
 ## Categories
 {cat_lines}
 
+## Product types
+{type_lines}
+
+## Brands carried
+{brand_lines}
+
 ## For brands
 - Why list: {BASE}/for-brands/
 - Pricing, from ${SITE['price_entry']}/mo, no contract: {BASE}/pricing/
@@ -987,8 +1121,10 @@ listings. Store counts and listing counts in this file are literal.
 Publisher: {SITE['publisher']} ({SITE['publisher_url']}).
 """))
 
-    urls = ["/", "/stores/", "/search/", "/for-brands/", "/pricing/", "/how-it-works/", "/join/", "/about/"]
+    urls = ["/", "/contents/", "/stores/", "/search/", "/for-brands/", "/pricing/", "/how-it-works/", "/join/", "/about/"]
     urls += [f"/c/{c['slug']}/" for c in CATS]
+    urls += [f"/t/{k}/" for k in TYPES]
+    urls += [f"/b/{k}/" for k in BRANDS]
     urls += [f"/stores/{s['slug']}/" for s in STORES]
     body = "".join(
         f"<url><loc>{BASE}{u}</loc><lastmod>{TODAY}</lastmod>"
@@ -1009,6 +1145,9 @@ def main():
     made.append(page_stores())
     for s in STORES: made.append(page_store(s))
     for c in CATS: made.append(page_category(c))
+    made.append(page_indexes())
+    for k, v in TYPES.items():  made.append(page_facet("t", k, v))
+    for k, v in BRANDS.items(): made.append(page_facet("b", k, v))
     made.append(page_search())
     made.append(page_for_brands())
     made.append(page_pricing())

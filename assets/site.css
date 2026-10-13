@@ -1,62 +1,73 @@
 /* Commerce Plugs — design system
-   Deliberately unlike: warm-cream + system-serif + pill-button sites, and unlike Amazon.
-   Signature: Space Grotesk display, IBM Plex Sans body, IBM Plex Mono data rails,
-   3px corners, hairline rules, hard offset shadows, cool neutrals, electric indigo. */
+   A printed trade directory, not a software landing page.
+   Newsprint stock, ink black, oxblood red for emphasis the way a printed
+   index uses it. Editorial serif for voice, grotesque for data. Scotch rules
+   (thick over thin) as the dividing device. No monospace anywhere: machine
+   fonts are what every other index-of-things site reaches for, and they make
+   a directory read like a terminal instead of a reference work. */
 
 :root {
-  /* neutrals — cool, never warm */
-  --ink: #0B0B0F;
-  --ink-2: #41414E;
-  --muted: #71717F;
-  --paper: #FFFFFF;
-  --surface: #F4F4F7;
-  --surface-2: #E9E9F0;
-  --line: #DCDCE6;
-  --line-2: #C3C3D1;
+  /* stock and ink */
+  --ink: #16181C;          /* ink black, very slightly cool */
+  --ink-2: #44494F;
+  --muted: #5E646C;
+  --paper: #F7F6F1;        /* newsprint stock, not white, not cream */
+  --paper-2: #FFFFFF;      /* true white, used only where goods are shown */
+  --surface: #EDEBE4;
+  --surface-2: #E2DFD6;
+  --line: #CFCBC0;
+  --line-2: #948E83;
 
-  /* brand */
-  --brand: #3B2BE0;
-  --brand-ink: #2518A8;
-  --brand-soft: #EEEBFF;
-  --signal: #00875A;
-  --signal-soft: #E1F5EE;
-  --flag: #D92D0B;
-  --flag-soft: #FFEDE8;
+  /* emphasis: oxblood, as a printed index uses red */
+  --brand: #8C1D18;
+  --brand-ink: #6B1310;
+  --brand-soft: #F3E4E2;
+  --signal: #2F5D3A;
+  --signal-soft: #E6EDE6;
+  --flag: #8C1D18;
+  --flag-soft: #F3E4E2;
 
   /* form */
-  --radius: 3px;
-  --radius-lg: 4px;
-  --hard: 3px 3px 0 var(--ink);
-  --hard-brand: 3px 3px 0 var(--brand);
+  --radius: 0;             /* printed matter has no rounded corners */
+  --radius-lg: 0;
+  --hard: none;
+  --hard-brand: none;
   --rail: 1px solid var(--line);
 
-  --display: "Space Grotesk", "Helvetica Neue", Arial, sans-serif;
-  --sans: "IBM Plex Sans", system-ui, -apple-system, Segoe UI, Roboto, sans-serif;
-  --mono: "IBM Plex Mono", ui-monospace, SFMono-Regular, Menlo, monospace;
+  --display: Newsreader, "Times New Roman", Times, serif;
+  --sans: Archivo, "Helvetica Neue", Helvetica, Arial, sans-serif;
+  --mono: Archivo, "Helvetica Neue", Helvetica, Arial, sans-serif;
 
-  --maxw: 1320px;
-  --gut: 20px;
+  /* The masthead and colophon are printed in ink on stock in both schemes.
+     They must not invert, or the plate flips and the hardcoded whites break. */
+  --mast: #16181C;
+  --mast-ink: #F7F6F1;
+  --mast-ink-2: #C9C4B9;
+  --mast-accent: #E8A9A2;
+  --mast-brand: #8C1D18;   /* the plate accent, fixed like the rest of the masthead */
+
+  --maxw: 1280px;
+  --gut: 22px;
 }
 
 @media (prefers-color-scheme: dark) {
   :root:not([data-theme="light"]) {
-    --ink: #F2F2F6;
-    --ink-2: #BDBDCB;
-    --muted: #8E8EA0;
-    --paper: #0C0C11;
-    --surface: #14141B;
-    --surface-2: #1D1D27;
-    --line: #2A2A36;
-    --line-2: #3A3A49;
-    --brand: #8E7BFF;
-    --brand-ink: #B5A8FF;
-    --brand-soft: #1B1734;
-    --signal: #3DD6A0;
-    --signal-soft: #0F2A22;
-    --flag: #FF7A5E;
-    --flag-soft: #2B140F;
-    --hard: 3px 3px 0 #000;
-    --hard-brand: 3px 3px 0 var(--brand);
+    --ink: #EDEAE2;
+    --ink-2: #B9B4A9;
+    --muted: #8A857B;
+    --paper: #141414;
+    --paper-2: #1C1C1B;
+    --surface: #1E1E1C;
+    --surface-2: #2A2A27;
+    --line: #35352F;
+    --line-2: #4A4A43;
+    --brand: #E0796F;
+    --brand-ink: #EFA096;
+    --brand-soft: #32201E;
+    --signal: #7FB68C;
+    --signal-soft: #1C2A1F;
+    --flag: #E0796F;
+    --flag-soft: #32201E;
   }
 }
 :root[data-theme="dark"] {
@@ -75,25 +86,36 @@ body {
   margin: 0;
   background: var(--paper);
   color: var(--ink);
-  font: 400 16px/1.55 var(--sans);
+  font: 400 16.5px/1.6 var(--display);
+  font-variant-numeric: oldstyle-nums;
   -webkit-font-smoothing: antialiased;
 }
 img, svg { max-width: 100%; display: block; }
-a { color: var(--brand); text-decoration: none; }
+a { color: var(--ink); text-decoration: none; }
+a:hover { color: var(--brand); }
 a:hover { text-decoration: underline; text-underline-offset: 3px; }
 hr { border: 0; border-top: var(--rail); margin: 28px 0; }
 
 h1, h2, h3, h4 {
   overflow-wrap: break-word;
   font-family: var(--display);
-  font-weight: 700;
-  letter-spacing: -.025em;
-  line-height: 1.08;
+  font-weight: 600;
+  letter-spacing: -.012em;     /* a serif does not want the tight tracking a grotesque does */
+  line-height: 1.1;
   margin: 0 0 .5rem;
 }
-h1 { font-size: clamp(1.85rem, 5.2vw, 3.5rem); }
-h2 { font-size: clamp(1.5rem, 3.2vw, 2.1rem); }
-h3 { font-size: 1.15rem; letter-spacing: -.015em; }
+h1 { font-size: clamp(2rem, 5.4vw, 3.6rem); line-height: 1.02; }
+h2 { font-size: clamp(1.45rem, 3vw, 2rem); }
+h3 { font-size: 1.14rem; }
+
+/* the printer's small-cap label, replacing uppercase mono tracking */
+.label, .eyebrow, .kick {
+  font-family: var(--display); font-style: italic; font-weight: 400;
+  font-size: .95rem; letter-spacing: 0; text-transform: none; color: var(--brand);
+}
+
+/* Scotch rule: thick over thin, the dividing device of printed directories */
+.scotch { border-top: 3px solid var(--ink); box-shadow: 0 2px 0 -1px var(--ink); height: 0; margin: 0; }
 p { margin: 0 0 .9rem; }
 
 .wrap { max-width: var(--maxw); margin: 0 auto; padding: 0 var(--gut); }
@@ -109,10 +131,11 @@ p { margin: 0 0 .9rem; }
 
 /* ---- mono data rail: the signature element ---- */
 .rail {
-  font-family: var(--mono);
-  font-size: .68rem;
-  letter-spacing: .07em;
-  text-transform: uppercase;
+  font-family: var(--display);
+  font-style: italic;
+  font-size: .9rem;
+  letter-spacing: 0;
+  text-transform: none;
   color: var(--muted);
   display: flex;
   gap: 10px;
@@ -622,3 +645,243 @@ img, svg { max-width: 100%; height: auto; }
 .spec dt { font: 500 .7rem var(--mono); letter-spacing: .1em; text-transform: uppercase; color: var(--muted); padding-top: 2px; }
 .spec dd { margin: 0; font-size: .95rem; }
 @media (max-width: 620px) { .spec div { grid-template-columns: 1fr; gap: 2px; } }
+
+/* ============================================================
+   DIRECTORY DRESS — overrides the software-shaped components.
+   Every uppercase-wide-tracked label and every monospace rail
+   from the first pass is retired here. Printed matter instead:
+   small-caps serif labels, Scotch rules, hanging margin
+   numbers, tabular lining figures only where columns must line
+   up (prices, counts).
+   ============================================================ */
+
+/* --- masthead: a directory title page, not an app bar --- */
+.top { background: var(--ink); color: var(--paper); border-bottom: 0; }
+.top-in { padding: 14px var(--gut); gap: 20px; }
+.mark .m1 {
+  font-family: var(--display); font-weight: 600; font-size: 1.5rem;
+  letter-spacing: -.015em; color: var(--paper);
+}
+.mark .m2 {
+  font-family: var(--display); font-style: italic; font-weight: 400;
+  font-size: .85rem; letter-spacing: 0; text-transform: none;
+  color: var(--brand-soft); border: 0; padding: 0 0 0 .15rem; opacity: .75;
+}
+.top-act a { font-family: var(--sans); font-size: .85rem; font-weight: 500; border-radius: 0; }
+.top-act .cta { background: var(--brand); border-color: var(--brand); }
+.top-act .cta:hover { background: var(--brand-ink); border-color: var(--brand-ink); }
+
+.find select, .find input, .find button { border-radius: 0; }
+.find select {
+  font: 500 .82rem var(--sans); text-transform: none; letter-spacing: 0;
+  background: #2A2D33; border-color: var(--paper);
+}
+.find input { font: 400 1rem var(--sans); }
+.find button { font: 600 .9rem var(--sans); background: var(--brand); border-color: var(--brand); }
+.find button:hover { background: var(--brand-ink); border-color: var(--brand-ink); }
+
+/* --- category strip: a running head, set in the serif --- */
+.strip { background: var(--surface); border-bottom: 1px solid var(--line); border-top: 1px solid var(--line); }
+.strip a {
+  font: 400 .95rem var(--display); color: var(--ink-2);
+  padding: .55rem .75rem; border-bottom: 2px solid transparent;
+}
+.strip a:hover, .strip a[aria-current] { color: var(--brand); border-bottom-color: var(--brand); background: none; }
+
+.crumb { font-family: var(--display); font-style: italic; font-size: .9rem; text-transform: none; letter-spacing: 0; }
+
+/* --- the standing line: italic serif, not a mono readout --- */
+.orient {
+  font: 400 1rem/1.5 var(--display); font-style: italic; letter-spacing: 0;
+  text-transform: none; color: var(--ink-2);
+  border-bottom: 3px solid var(--ink); box-shadow: 0 2px 0 -1px var(--ink);
+  padding: 12px 0 13px; gap: 0 8px;
+}
+.orient b { font-style: normal; font-weight: 600; font-variant-numeric: lining-nums tabular-nums; color: var(--ink); }
+.orient .sep { color: var(--line-2); font-style: normal; }
+
+/* --- statement: the directory's standing description --- */
+.state { padding: 46px 0 38px; border-bottom: 1px solid var(--line); }
+.state h1 { max-width: 15ch; }
+.state h1 em { font-style: italic; color: var(--brand); }
+.state p { font-size: 1.12rem; line-height: 1.6; max-width: 56ch; color: var(--ink-2); }
+.state .after a {
+  font: 400 1.02rem var(--display); border-bottom: 1px solid var(--brand);
+  color: var(--brand); padding-bottom: 2px;
+}
+.state .after a:hover { background: var(--brand); color: var(--paper); border-color: var(--brand); }
+
+/* --- section rules: a heading sitting on a Scotch rule --- */
+.rule {
+  border-bottom: 3px solid var(--ink); box-shadow: 0 2px 0 -1px var(--ink);
+  padding-bottom: 6px; margin: 40px 0 0; gap: 14px;
+}
+.rule h2 {
+  font: 600 1.18rem var(--display); letter-spacing: -.01em;
+  text-transform: none; margin: 0; color: var(--ink);
+}
+.rule .n { font: italic 400 .95rem var(--display); letter-spacing: 0; color: var(--muted); }
+.rule .more {
+  font: 400 .95rem var(--display); letter-spacing: 0; text-transform: none;
+  color: var(--brand); border-bottom: 1px solid var(--brand); padding-bottom: 1px;
+}
+.rule select.more {
+  border: 1px solid var(--line-2); border-radius: 0; background: var(--paper);
+  padding: .3rem .5rem; color: var(--ink); font-family: var(--sans); font-size: .85rem;
+}
+
+/* --- index: dot leaders, serif, lining figures so counts align --- */
+.index-list { column-rule: 1px solid var(--line); padding-top: 10px; }
+.ix { font: 400 1.02rem var(--display); padding: .42rem 0; border-bottom: 1px dotted var(--line); }
+.ix .ct {
+  font: 500 .95rem var(--sans); font-variant-numeric: lining-nums tabular-nums;
+  color: var(--ink-2);
+}
+.ix:hover, .ix:hover .ct { color: var(--brand); }
+
+/* --- register: a ledger. Entry numbers hang in the margin. --- */
+.register { font-family: var(--sans); font-size: .93rem; }
+.register th {
+  font: italic 400 .92rem var(--display); letter-spacing: 0; text-transform: none;
+  color: var(--muted); border-bottom: 1px solid var(--ink); padding-bottom: 6px;
+}
+.register td { border-bottom: 1px solid var(--line); }
+.register .ix-n {
+  font: 400 .95rem var(--display); font-variant-numeric: lining-nums tabular-nums;
+  color: var(--brand); padding-right: 14px;
+}
+.register .nm a { font: 600 1.12rem var(--display); letter-spacing: -.01em; }
+.register .nm a:hover { color: var(--brand); }
+.register .dom { font: italic 400 .88rem var(--display); color: var(--muted); }
+.register .num { font-variant-numeric: lining-nums tabular-nums; }
+
+/* --- listing rows: a price list. Goods sit on white, page is newsprint. --- */
+.rows { border-top: 3px solid var(--ink); box-shadow: 0 2px 0 -1px var(--ink); }
+.row { padding: 15px 0; border-bottom: 1px solid var(--line); }
+.row:hover { background: var(--surface); }
+.row .th { background: var(--paper-2); border: 1px solid var(--line); border-radius: 0; }
+.row .ttl { font: 600 1.08rem/1.3 var(--display); letter-spacing: -.01em; margin-bottom: .22rem; }
+.row .ttl:hover { color: var(--brand); }
+.row .meta {
+  font: 400 .84rem var(--sans); letter-spacing: 0; text-transform: none; color: var(--muted);
+  font-variant-numeric: lining-nums;
+}
+.row .meta b { font-weight: 600; color: var(--ink-2); }
+.row .desc { font: 400 .96rem/1.45 var(--display); color: var(--ink-2); }
+.row .amt .p {
+  font: 600 1.18rem var(--display); font-variant-numeric: lining-nums tabular-nums;
+  letter-spacing: -.01em; color: var(--ink);
+}
+.row .amt .go {
+  font: italic 400 .9rem var(--display); letter-spacing: 0; text-transform: none;
+  color: var(--brand);
+}
+
+/* --- ledge: a standing notice, ruled top and bottom --- */
+.ledge {
+  border-top: 3px solid var(--ink); box-shadow: 0 2px 0 -1px var(--ink);
+  border-bottom: 1px solid var(--ink); padding: 30px 0 32px;
+}
+.ledge h2 { font-size: clamp(1.5rem, 3.2vw, 2.2rem); max-width: 24ch; }
+.ledge p { font-size: 1.05rem; }
+.ledge .after a {
+  font: 400 1.02rem var(--display); border-bottom: 1px solid var(--brand); color: var(--brand);
+}
+.ledge .after a:hover { background: var(--brand); color: var(--paper); }
+
+/* --- spec sheet --- */
+.spec dt { font: italic 400 .95rem var(--display); letter-spacing: 0; text-transform: none; color: var(--muted); }
+.spec dd { font: 400 1rem var(--display); font-variant-numeric: lining-nums; }
+
+/* --- side rail, tags, buttons: square, printed --- */
+.side { border-radius: 0; background: var(--surface); border-color: var(--line); }
+.side h4 { font: italic 400 .98rem var(--display); letter-spacing: 0; text-transform: none; color: var(--brand); }
+.tag {
+  border-radius: 0; font: italic 400 .86rem var(--display); letter-spacing: 0;
+  text-transform: none; padding: .1rem .45rem;
+}
+.btn {
+  border-radius: 0; font-family: var(--sans); font-weight: 500; box-shadow: none;
+  letter-spacing: 0; text-transform: none;
+}
+.btn:hover { box-shadow: none; }
+.btn-brand { background: var(--brand); border-color: var(--brand); color: var(--paper); }
+.btn-brand:hover { background: var(--brand-ink); border-color: var(--brand-ink); }
+.card, .slot, .note, .machine, .tier { border-radius: 0; box-shadow: none; }
+.card-hover:hover { box-shadow: none; border-color: var(--ink); }
+.note { border-left: 3px solid var(--brand); background: var(--surface); }
+.slot { background: var(--surface); border: 1px dashed var(--line-2); }
+.count, .bar .count { font: italic 400 .95rem var(--display); letter-spacing: 0; text-transform: none; }
+
+/* --- footer: a colophon --- */
+.foot { background: var(--ink); color: var(--paper); border-top: 0; }
+.foot .mark .m1 { color: var(--paper) !important; }
+.foot h4 { font: italic 400 .98rem var(--display); letter-spacing: 0; text-transform: none; color: var(--brand-soft); opacity: .8; }
+.foot a { color: #D6D2C8; font-family: var(--display); font-size: .98rem; }
+.foot a:hover { color: var(--paper); }
+.foot-end { font: italic 400 .9rem var(--display); letter-spacing: 0; text-transform: none; color: #9A958B; }
+.foot .rail { color: #9A958B; }
+
+/* --- pricing tiers as a rate card --- */
+.tier { border: 1px solid var(--line-2); background: var(--paper-2); }
+.tier.pick { border: 3px solid var(--ink); }
+.tier .nm { font: 600 1.3rem var(--display); letter-spacing: -.01em; text-transform: none; }
+.tier .amt { font: 600 3rem var(--display); font-variant-numeric: lining-nums; letter-spacing: -.02em; }
+.tier .per { font: italic 400 .95rem var(--display); letter-spacing: 0; text-transform: none; }
+.tier ul { font-family: var(--display); }
+
+/* --- steps as a numbered schedule --- */
+.step h3 { font-family: var(--display); font-weight: 600; }
+.step p { font-family: var(--display); }
+
+
+/* ============================================================
+   CONTRAST CORRECTIONS
+   Footer text sits on ink, so it needs rules that outrank the
+   light-background defaults set earlier in this file. Audited
+   against WCAG AA (4.5:1 body, 3:1 large).
+   ============================================================ */
+.foot, .foot p, .foot span, .foot li { color: #DAD6CC; }
+.foot li a, .foot a, .foot-cols a { color: #DAD6CC; font-family: var(--display); font-size: .98rem; }
+.foot li a:hover, .foot a:hover { color: #FFFFFF; text-decoration: underline; }
+.foot h4 { color: #E8A9A2; opacity: 1; }
+.foot .rail, .foot .rail b, .foot-end, .foot .sm, .foot .muted { color: #B6B1A6; }
+.foot .rail b { color: #DAD6CC; font-style: normal; }
+.foot .mark .m2 { color: #E8A9A2; opacity: 1; }
+
+/* separators are punctuation, but they still have to be legible */
+.orient .sep, .row .meta .sep, .rail .sep { color: var(--muted); }
+
+.crumb span { color: var(--muted); }
+.crumb a { color: var(--ink-2); }
+.crumb a:hover { color: var(--brand); }
+
+
+/* ============================================================
+   MASTHEAD AND COLOPHON — fixed plate, both colour schemes
+   ============================================================ */
+.top { background: var(--mast); color: var(--mast-ink); }
+.top a, .top-act a { color: var(--mast-ink); }
+.top-act a:hover { background: #2A2D33; }
+.top-act .cta, .top-act .cta:hover { color: var(--mast-ink); }
+.mark .m1 { color: var(--mast-ink); }
+.mark .m2 { color: var(--mast-accent); opacity: 1; }
+.find select { background: #2A2D33; color: var(--mast-ink); border-color: var(--mast-ink); }
+.find input { background: var(--mast-ink); color: var(--mast); border-color: var(--mast-ink); }
+.find input::placeholder { color: #6E6A62; }
+.find button { color: var(--mast-ink); }
+.skip { background: var(--mast); color: var(--mast-ink); }
+
+.foot { background: var(--mast); color: var(--mast-ink); }
+.foot, .foot p, .foot span, .foot li { color: var(--mast-ink-2); }
+.foot a, .foot li a, .foot-cols a { color: var(--mast-ink-2); }
+.foot a:hover, .foot li a:hover { color: var(--mast-ink); }
+.foot h4, .foot .mark .m2 { color: var(--mast-accent); opacity: 1; }
+.foot .mark .m1 { color: var(--mast-ink) !important; }
+.foot .rail, .foot-end, .foot .sm, .foot .muted { color: #A7A295; }
+.foot .rail b { color: var(--mast-ink-2); }
+
+.top-act .cta { background: var(--mast-brand); border-color: var(--mast-brand); color: var(--mast-ink); }
+.top-act .cta:hover { background: #6B1310; border-color: #6B1310; color: var(--mast-ink); }
+.find button { background: var(--mast-brand); border-color: var(--mast-brand); color: var(--mast-ink); }
+.find button:hover { background: #6B1310; border-color: #6B1310; }
