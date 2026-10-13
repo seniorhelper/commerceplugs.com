@@ -1,0 +1,18 @@
+[
+  {"slug":"home-bath","name":"Home & Bath","blurb":"Fixtures, enclosures, storage and everything that makes a room work.","icon":"bath"},
+  {"slug":"kitchen","name":"Kitchen","blurb":"Cookware, small appliances, prep tools and tableware.","icon":"kitchen"},
+  {"slug":"electronics","name":"Electronics & Accessories","blurb":"Cases, cables, audio, charging and desk gear.","icon":"chip"},
+  {"slug":"apparel","name":"Apparel","blurb":"Clothing from brands that make their own product.","icon":"shirt"},
+  {"slug":"beauty","name":"Beauty & Personal Care","blurb":"Skin, hair, grooming and fragrance from independent makers.","icon":"drop"},
+  {"slug":"outdoors-garden","name":"Outdoors & Garden","blurb":"Growing, grilling, camping and yard.","icon":"leaf"},
+  {"slug":"pets","name":"Pets","blurb":"Food, gear and enrichment for animals.","icon":"paw"},
+  {"slug":"toys-games","name":"Toys & Games","blurb":"Play, puzzles, tabletop and hobby.","icon":"dice"},
+  {"slug":"sports-fitness","name":"Sports & Fitness","blurb":"Training, recovery and the outdoors.","icon":"bolt"},
+  {"slug":"office","name":"Office & Stationery","blurb":"Paper, pens, desks and the things on them.","icon":"pen"},
+  {"slug":"tools-hardware","name":"Tools & Hardware","blurb":"Hand tools, power tools, fasteners and shop supply.","icon":"wrench"},
+  {"slug":"food-drink","name":"Food & Drink","blurb":"Roasters, bakers, distillers and small-batch pantry.","icon":"cup"},
+  {"slug":"jewelry-watches","name":"Jewelry & Watches","blurb":"Makers working in metal, stone and movement.","icon":"gem"},
+  {"slug":"art-collectibles","name":"Art & Collectibles","blurb":"Prints, originals, vintage and the hard to find.","icon":"frame"},
+  {"slug":"baby-kids","name":"Baby & Kids","blurb":"Gear, clothing and things built to survive children.","icon":"star"},
+  {"slug":"auto-moto","name":"Auto & Moto","blurb":"Parts, care, accessories and garage.","icon":"car"}
+]

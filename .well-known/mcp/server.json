@@ -1,0 +1,98 @@
+{
+  "name": "commerce-plugs-index",
+  "version": "1.0.0",
+  "description": "Query Commerce Plugs, an index of verified independent online stores. Read-only. Every record carries a verification date.",
+  "websiteUrl": "https://commerceplugs.com/",
+  "capabilities": {
+    "tools": true
+  },
+  "tools": [
+    {
+      "name": "search_products",
+      "description": "Search listings across every independent store in the index.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "query": {
+            "type": "string"
+          },
+          "category": {
+            "type": "string"
+          },
+          "max_price": {
+            "type": "number"
+          },
+          "ships_to": {
+            "type": "string"
+          },
+          "limit": {
+            "type": "integer",
+            "default": 20
+          }
+        },
+        "required": [
+          "query"
+        ]
+      }
+    },
+    {
+      "name": "search_stores",
+      "description": "Find independent stores by category, country or what they sell.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "query": {
+            "type": "string"
+          },
+          "category": {
+            "type": "string"
+          },
+          "ships_to": {
+            "type": "string"
+          },
+          "limit": {
+            "type": "integer",
+            "default": 20
+          }
+        }
+      }
+    },
+    {
+      "name": "get_store",
+      "description": "Full record for one store, including catalog and verification date.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "store_id": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "store_id"
+        ]
+      }
+    },
+    {
+      "name": "list_categories",
+      "description": "All categories with store and listing counts.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {}
+      }
+    }
+  ],
+  "dataFeeds": [
+    {
+      "type": "stores",
+      "url": "https://commerceplugs.com/feeds/stores.json"
+    },
+    {
+      "type": "products",
+      "url": "https://commerceplugs.com/feeds/products.json"
+    },
+    {
+      "type": "products-tsv",
+      "url": "https://commerceplugs.com/feeds/products.tsv"
+    }
+  ]
+}

@@ -1,0 +1,27 @@
+{
+  "generated_at": "2026-10-13T00:00:00Z",
+  "schema": "https://commerceplugs.com/feeds/README.md",
+  "license": "CC-BY-4.0",
+  "count": 1,
+  "notes": "Unconfirmed fields are null, never estimated. No placeholder records.",
+  "stores": [
+    {
+      "id": "showers4less",
+      "name": "Showers4Less",
+      "url": "https://showers4less.com",
+      "page": "https://commerceplugs.com/stores/showers4less/",
+      "description": null,
+      "categories": [
+        "home-bath"
+      ],
+      "ships_from": null,
+      "ships_to": [],
+      "currency": null,
+      "listing_status": "pending_verification",
+      "catalog_status": "not_connected",
+      "listings": 0,
+      "added": "2026-10-13",
+      "last_verified": null
+    }
+  ]
+}
