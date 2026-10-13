@@ -1509,3 +1509,25 @@ a[style*="--brand)"], .sheet-top a { color: var(--brand-ink); }
   border-color: var(--brand); color: var(--brand-ink); background: var(--brand-soft); text-decoration: none;
 }
 .hero-jump-row a:hover b { color: var(--brand-ink); }
+
+/* ============================================================
+   COLOUR FREQUENCY, NOT JUST BUTTON WEIGHT
+   One filled button was the right rule and the wrong fix: violet
+   still appeared three times above the fold (outlined masthead
+   CTA, filled hero button, tinted merchant panel) so it stopped
+   meaning anything. Violet now appears ONCE per fold — the
+   page's own primary action. Persistent chrome is neutral, and
+   the merchant track takes teal, which is its own colour anyway.
+   ============================================================ */
+
+/* masthead CTA: neutral outline. It is navigation, not the ask. */
+.top-act .cta { background: transparent; border: 1.5px solid var(--line-2); color: var(--ink); }
+.top-act .cta:hover { background: var(--surface); border-color: var(--ink); color: var(--ink); }
+
+/* merchant CTA: teal, the secondary track's own colour */
+.hero-cta { border-color: var(--accent); background: var(--accent-soft); }
+.hero-cta .glyph, .hero-cta b, .hero-cta .go { color: var(--accent-ink); }
+.hero-cta:hover { background: var(--on-accent); border-color: var(--on-accent); color: #fff; }
+.hero-cta:hover .glyph, .hero-cta:hover b, .hero-cta:hover .go { color: #fff; }
+
+/* so the only violet above the fold is the mark and the one button */
