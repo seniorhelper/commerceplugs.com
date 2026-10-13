@@ -140,7 +140,7 @@ def head(title, desc, path, extra="", ld=None, og="default", og_alt=None):
 
 # The mark is the out-arrow: every link on this site leaves for the seller.
 # Settled in the brand round — orange tile, white arrow, 16px radius.
-def arrow_svg(size=30, fill="#F15A22", glyph="#fff", rx=16):
+def arrow_svg(size=39, fill="#6E3BFF", glyph="#fff", rx=16):
     return (f'<svg viewBox="0 0 64 64" width="{size}" height="{size}" aria-hidden="true" focusable="false">'
             f'<rect x="2" y="2" width="60" height="60" rx="{rx}" fill="{fill}"/>'
             f'<path d="M24 40 L40 24" stroke="{glyph}" stroke-width="6" stroke-linecap="round"/>'
@@ -164,7 +164,7 @@ def socket_svg(size=24, color="currentColor"):
             f'<rect x="24" y="22" width="6" height="20" rx="3" fill="{color}"/>'
             f'<rect x="34" y="22" width="6" height="20" rx="3" fill="{color}"/></svg>')
 
-MARK = arrow_svg()
+MARK = arrow_svg()   # 39px: 30% up on the old 30px
 
 def wordmark():
     return f'{MARK}<span class="m1">commerce<b>plugs</b><i>.</i></span>'

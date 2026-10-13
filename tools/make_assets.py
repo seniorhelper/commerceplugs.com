@@ -16,8 +16,8 @@ os.makedirs(ICON, exist_ok=True); os.makedirs(OG, exist_ok=True)
 
 INK      = (14, 14, 17)
 PAPER    = (255, 255, 255)
-OXBLOOD  = (241, 90, 34)      # orange: the primary, on fills and the mark
-PETROL   = (110, 59, 255)     # violet: the secondary, on figures and data
+OXBLOOD  = (110, 59, 255)     # violet: the primary, on fills and the mark
+PETROL   = (14, 122, 112)     # teal: the secondary, on figures and verified state
 MUTED    = (95, 95, 105)
 
 def font(name, size):
@@ -55,7 +55,7 @@ ims[0].save(os.path.join(ROOT, "favicon.ico"), sizes=[(16, 16), (32, 32), (48, 4
 # an SVG mark too: sharp at any size, and it is what modern browsers prefer
 open(os.path.join(ICON, "icon.svg"), "w").write(
     '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64">'
-    '<rect x="2" y="2" width="60" height="60" rx="16" fill="#F15A22"/>'
+    '<rect x="2" y="2" width="60" height="60" rx="16" fill="#6E3BFF"/>'
     '<path d="M24 40 L40 24" stroke="#fff" stroke-width="6.5" stroke-linecap="round"/>'
     '<path d="M27 24 H40 V37" fill="none" stroke="#fff" stroke-width="6.5" '
     'stroke-linecap="round" stroke-linejoin="round"/></svg>')

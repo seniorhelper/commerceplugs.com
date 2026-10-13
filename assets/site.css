@@ -25,16 +25,16 @@
      in the same element, so each keeps a meaning.
      Bright shades are for fills and large graphics; the deep shades are what
      white text and small links sit on, because the bright ones do not pass. */
-  --brand: #F15A22;
-  --brand-ink: #C2410C;
-  --brand-soft: #FFF0E9;
-  --accent: #6E3BFF;
-  --accent-ink: #5A21D6;
-  --accent-soft: #F1ECFF;
+  --brand: #6E3BFF;
+  --brand-ink: #5A21D6;
+  --brand-soft: #F1ECFF;
+  --accent: #0E9C8F;
+  --accent-ink: #0B7A70;
+  --accent-soft: #E3F5F2;
   --signal: #0E9C8F;
   --signal-soft: #E3F5F2;
-  --ink2: #6E3BFF;
-  --ink2-soft: #F1ECFF;
+  --ink2: #0E9C8F;
+  --ink2-soft: #E3F5F2;
   --flag: #D93A1F;
   --flag-soft: #FDEBE7;
 
@@ -53,8 +53,8 @@
   --mast: #FFFFFF;
   --mast-ink: #0E0E11;
   --mast-ink-2: #5F5F69;
-  --mast-accent: #F15A22;
-  --mast-brand: #F15A22;
+  --mast-accent: #6E3BFF;
+  --mast-brand: #6E3BFF;
 
   --maxw: 1280px;
   --gut: 22px;
@@ -71,23 +71,23 @@
     --surface-2: #202027;
     --line: #2B2B33;
     --line-2: #3C3C46;
-    --brand: #FF7A45;
-    --brand-ink: #FF9468;
-    --brand-soft: #2A1710;
-    --accent: #9B6CFF;
-    --accent-ink: #B494FF;
-    --accent-soft: #1C1630;
+    --brand: #9B6CFF;
+    --brand-ink: #B494FF;
+    --brand-soft: #1C1630;
+    --accent: #2ED3BE;
+    --accent-ink: #4FE0CD;
+    --accent-soft: #0F2A27;
     --signal: #2ED3BE;
     --signal-soft: #0F2A27;
-    --ink2: #9B6CFF;
-    --ink2-soft: #1C1630;
+    --ink2: #2ED3BE;
+    --ink2-soft: #0F2A27;
     --flag: #FF7A61;
     --flag-soft: #2E1712;
     --mast: #0E0E11;
     --mast-ink: #F3F3F6;
     --mast-ink-2: #8E8E9A;
-    --mast-accent: #FF7A45;
-    --mast-brand: #F15A22;
+    --mast-accent: #9B6CFF;
+    --mast-brand: #6E3BFF;
   }
 }
 :root[data-theme="dark"] {
@@ -1417,3 +1417,66 @@ a[style*="--brand)"], .sheet-top a { color: var(--brand-ink); }
 .htile-cap { color: #0E0E11; background: linear-gradient(to top, rgba(255,255,255,.97) 65%, rgba(255,255,255,0)); }
 .htile-cap b { color: #5F5F69; }
 .htile:hover .htile-cap { color: #C2410C; }
+
+/* ============================================================
+   VIOLET PRIMARY — and one filled button per view
+   Three brand-coloured buttons competing on one screen is a
+   hierarchy problem, not a colour one. The brand fill is now
+   reserved for the single most important action in each region:
+   search is a utility and goes neutral, the persistent masthead
+   call to action is outlined rather than filled, and the hero
+   keeps the one filled button on the page.
+   ============================================================ */
+
+:root { --on-brand: #5A21D6; --on-accent: #0B7A70; }
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) { --on-brand: #5A21D6; --on-accent: #0B7A70; }
+}
+
+/* the mark, 30% up */
+.mark { gap: .62rem; }
+.mark .m1 { font-size: 1.72rem; letter-spacing: -.04em; }
+.mark svg { width: 39px; height: 39px; }
+@media (max-width: 560px) { .mark .m1 { font-size: 1.4rem; } .mark svg { width: 32px; height: 32px; } }
+.foot .mark .m1 { font-size: 1.5rem; }
+
+/* search is a utility, not a call to action */
+.find button { background: var(--ink); border-color: var(--ink); color: var(--paper); }
+.find button:hover { background: var(--ink-2); border-color: var(--ink-2); color: var(--paper); }
+
+/* the masthead button is persistent chrome: outlined, so it never competes
+   with the one real call to action on whatever page you are looking at */
+.top-act .cta {
+  background: transparent; border: 1.5px solid var(--brand); color: var(--brand-ink);
+}
+.top-act .cta:hover { background: var(--brand-soft); border-color: var(--brand-ink); color: var(--brand-ink); }
+
+/* one filled button per view: the hero's */
+.hero .after a:first-child { background: var(--on-brand); border-color: var(--on-brand); color: #fff; }
+.hero .after a:first-child:hover { background: #4A1BB5; border-color: #4A1BB5; color: #fff; }
+
+/* elsewhere the primary stays filled, because those pages have only one */
+.btn-brand, .state .after a:first-child, .ledge .after a:first-child {
+  background: var(--on-brand); border-color: var(--on-brand); color: #fff;
+}
+.btn-brand:hover, .state .after a:first-child:hover, .ledge .after a:first-child:hover {
+  background: #4A1BB5; border-color: #4A1BB5; color: #fff;
+}
+
+/* teal now carries verified state and figures; violet carries action */
+.figure .v { color: var(--accent-ink); }
+.register .ix-n { color: var(--accent-ink); }
+.hero-trust .glyph { color: var(--accent-ink); }
+.tag-ok { background: var(--accent-soft); border-color: var(--accent); color: var(--accent-ink); }
+
+/* the merchant call to action keeps a tint rather than a third button colour */
+.hero-cta { border-color: var(--brand); background: var(--brand-soft); }
+.hero-cta .glyph, .hero-cta b, .hero-cta .go { color: var(--brand-ink); }
+.hero-cta:hover { background: var(--on-brand); border-color: var(--on-brand); color: #fff; }
+.hero-cta:hover .glyph, .hero-cta:hover b, .hero-cta:hover .go { color: #fff; }
+
+.bleed-ink { background: var(--on-brand); }
+.bleed-ink p { color: #E6DBFF; }
+.bleed-ink p.label, .bleed-ink .label, .bleed-ink .eyebrow, .bleed-ink .kick { color: #EFE7FF; }
+.bleed-red .claim em, .bleed-red a:hover { color: #B494FF; }
+.htile:hover .htile-cap { color: #5A21D6; }

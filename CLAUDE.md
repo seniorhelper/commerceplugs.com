@@ -19,16 +19,21 @@ Standing decisions for this project. Read this before changing anything.
 
 ## Brand
 
-Orange leads, violet supports, and they never appear in the same element —
-orange marks what you act on, violet marks what has been counted or verified.
+Violet leads, teal supports. Violet marks what you act on; teal marks what has
+been counted or verified. No orange — it was tried and rejected.
 
 | Token | Value | Use |
 |---|---|---|
-| `--brand` | `#F15A22` | the plug mark, large fills. **Fails contrast for small text.** |
-| `--brand-ink` | `#C2410C` | buttons with white text, and every text link |
-| `--accent` | `#6E3BFF` | figures, counts, verified state |
-| `--accent-ink` | `#5A21D6` | the same, as small text |
-| `--ink` | `#0E0E11` | body text |
+| `--brand` | `#6E3BFF` | the mark, large fills |
+| `--brand-ink` / `--on-brand` | `#5A21D6` | buttons with white text, every text link |
+| `--accent` | `#0E9C8F` | figures, counts, verified state |
+| `--accent-ink` | `#0B7A70` | the same, as small text |
+| `--ink` | `#0E0E11` | body text, and the search button |
+
+**One filled brand button per view.** Three brand-coloured buttons competing on
+one screen is a hierarchy problem, not a colour one. Search is a utility and
+goes neutral ink; the masthead call to action is outlined because it is
+persistent chrome; the page's own primary action is the only filled one.
 
 Type: **Bricolage Grotesque** for display, **Outfit** for everything else, both
 self-hosted in `assets/fonts/`. 10px radius, no shadows. The page is light: white
