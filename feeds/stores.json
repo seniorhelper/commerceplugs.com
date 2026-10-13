@@ -10,18 +10,22 @@
       "name": "Showers4Less",
       "url": "https://showers4less.com",
       "page": "https://commerceplugs.com/stores/showers4less/",
-      "description": null,
+      "description": "Showers4Less is an independent online retailer in Denver, Colorado, operated by Aging Safely Baths. It specialises in accessible bathing: roll-in and barrier-free showers, ADA transfer showers, low-threshold walk-in systems, shower bases and pans, frameless and framed doors, steam generators and shower panels. The range also covers recovery equipment \u2014 infrared, outdoor and portable saunas, and cold plunge tubs. Products are sold DIY-ready or with installation, and the catalog runs from single fixtures to complete packages. Brands carried include ANZZI, Bestbath, SaunaSpa and SteamSpa.",
       "categories": [
-        "home-bath"
+        "home-bath",
+        "sports-fitness"
       ],
-      "ships_from": null,
-      "ships_to": [],
-      "currency": null,
-      "listing_status": "pending_verification",
-      "catalog_status": "not_connected",
-      "listings": 0,
+      "ships_from": "Denver, Colorado, United States",
+      "ships_to": [
+        "United States",
+        "Canada"
+      ],
+      "currency": "USD",
+      "listing_status": "verified",
+      "catalog_status": "connected",
+      "listings": 100,
       "added": "2026-10-13",
-      "last_verified": null
+      "last_verified": "2026-10-13"
     }
   ]
 }
