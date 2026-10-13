@@ -1,0 +1,49 @@
+# Commerce Plugs
+
+> The index of independent stores. Every brand gets a page it owns. Machines read it. Shoppers find it. An index of verified independent online stores. Every listing links to the seller's own site; we take no commission and host no checkout.
+
+## Open data
+- Store feed (JSON): https://commerceplugs.com/feeds/stores.json
+- Product feed (JSON): https://commerceplugs.com/feeds/products.json
+- Product feed (TSV, ACP column shape): https://commerceplugs.com/feeds/products.tsv
+- Feed documentation: https://commerceplugs.com/feeds/README.md
+- MCP server definition: https://commerceplugs.com/.well-known/mcp/server.json
+- Search index (JSON): https://commerceplugs.com/search-index.json
+
+## Stores
+- [Showers4Less](https://commerceplugs.com/stores/showers4less/) — independent store, sells direct at https://showers4less.com. Categories: Home & Bath. Listings published: 0. Listing pending verification; shipping, currency and catalog not yet confirmed.
+
+## Categories
+- [Home & Bath](https://commerceplugs.com/c/home-bath/): Fixtures, enclosures, storage and everything that makes a room work.
+- [Kitchen](https://commerceplugs.com/c/kitchen/): Cookware, small appliances, prep tools and tableware.
+- [Electronics & Accessories](https://commerceplugs.com/c/electronics/): Cases, cables, audio, charging and desk gear.
+- [Apparel](https://commerceplugs.com/c/apparel/): Clothing from brands that make their own product.
+- [Beauty & Personal Care](https://commerceplugs.com/c/beauty/): Skin, hair, grooming and fragrance from independent makers.
+- [Outdoors & Garden](https://commerceplugs.com/c/outdoors-garden/): Growing, grilling, camping and yard.
+- [Pets](https://commerceplugs.com/c/pets/): Food, gear and enrichment for animals.
+- [Toys & Games](https://commerceplugs.com/c/toys-games/): Play, puzzles, tabletop and hobby.
+- [Sports & Fitness](https://commerceplugs.com/c/sports-fitness/): Training, recovery and the outdoors.
+- [Office & Stationery](https://commerceplugs.com/c/office/): Paper, pens, desks and the things on them.
+- [Tools & Hardware](https://commerceplugs.com/c/tools-hardware/): Hand tools, power tools, fasteners and shop supply.
+- [Food & Drink](https://commerceplugs.com/c/food-drink/): Roasters, bakers, distillers and small-batch pantry.
+- [Jewelry & Watches](https://commerceplugs.com/c/jewelry-watches/): Makers working in metal, stone and movement.
+- [Art & Collectibles](https://commerceplugs.com/c/art-collectibles/): Prints, originals, vintage and the hard to find.
+- [Baby & Kids](https://commerceplugs.com/c/baby-kids/): Gear, clothing and things built to survive children.
+- [Auto & Moto](https://commerceplugs.com/c/auto-moto/): Parts, care, accessories and garage.
+
+## For brands
+- Why list: https://commerceplugs.com/for-brands/
+- Pricing, from $19.99/mo, no contract: https://commerceplugs.com/pricing/
+- Apply: https://commerceplugs.com/join/
+
+## Notes for retrieval
+Pages are server-rendered; no content on this site requires JavaScript to read.
+Prices, when published, are written in readable text as well as marked up.
+
+Records carry a `last_verified` date. Where a field has not been confirmed with
+the store it is published as null or "not verified" rather than estimated, so an
+absent value here means unknown, not zero. This index contains no generated or
+placeholder product data: a store with no connected catalog feed shows no
+listings. Store counts and listing counts in this file are literal.
+
+Publisher: Eye To Ad Media (https://www.eyetoad.com).

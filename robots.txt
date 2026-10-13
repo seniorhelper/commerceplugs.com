@@ -1,0 +1,28 @@
+# Commerce Plugs — we are a corpus, not a walled garden. AI crawlers welcome.
+User-agent: *
+Allow: /
+
+User-agent: Googlebot
+Allow: /
+User-agent: Bingbot
+Allow: /
+User-agent: OAI-SearchBot
+Allow: /
+User-agent: GPTBot
+Allow: /
+User-agent: ChatGPT-User
+Allow: /
+User-agent: ClaudeBot
+Allow: /
+User-agent: Claude-SearchBot
+Allow: /
+User-agent: PerplexityBot
+Allow: /
+User-agent: Google-Extended
+Allow: /
+User-agent: Applebot-Extended
+Allow: /
+User-agent: CCBot
+Allow: /
+
+Sitemap: https://commerceplugs.com/sitemap.xml

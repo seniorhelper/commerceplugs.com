@@ -1,0 +1,22 @@
+[
+  {
+    "slug": "showers4less",
+    "name": "Showers4Less",
+    "url": "https://showers4less.com",
+    "categories": ["home-bath"],
+    "plan": "index",
+    "claimed": false,
+    "listing_status": "pending_verification",
+    "catalog_status": "not_connected",
+    "added": "2026-10-13",
+    "tagline": null,
+    "summary": null,
+    "ships_from": null,
+    "ships_to": [],
+    "currency": null,
+    "price_band": null,
+    "returns": null,
+    "verified": null,
+    "values": []
+  }
+]
