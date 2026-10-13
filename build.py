@@ -892,31 +892,41 @@ def page_how():
 def page_join():
     trail = [("Home","/"),("Plug in",None)]
     opts = "".join(f'<option value="{c["slug"]}">{e(c["name"])}</option>' for c in CATS)
-    endpoint = SITE.get("apply_endpoint")
-    email = SITE.get("contact_email")
-    action = endpoint or (f"mailto:{email}" if email else None)
-    enc = "" if endpoint else ' enctype="text/plain"'
+    F = SITE.get("form") or {}
+    endpoint = F.get("endpoint")
 
     fields = f"""      <div class="field"><label for="f-store">Store name</label>
-        <input id="f-store" name="store" autocomplete="organization" required></div>
+        <input id="f-store" name="Store name" autocomplete="organization" required></div>
       <div class="field"><label for="f-url">Store URL</label>
-        <input id="f-url" name="url" type="url" inputmode="url" placeholder="https://" autocomplete="url" required></div>
+        <input id="f-url" name="Store URL" type="url" inputmode="url" placeholder="https://" autocomplete="url" required></div>
       <div class="field"><label for="f-email">Your email</label>
         <input id="f-email" name="email" type="email" inputmode="email" autocomplete="email" required></div>
       <div class="field"><label for="f-cat">Main category</label>
-        <select id="f-cat" name="category">{opts}</select></div>
-      <div class="field"><label for="f-plan">Plan</label><select id="f-plan" name="plan">
-        <option value="index">Index &mdash; {money(SITE["price_entry"])}/mo</option>
-        <option value="pro">Pro &mdash; $49/mo</option>
-        <option value="signal">Signal &mdash; $149/mo</option>
-        <option value="unsure">Not sure yet &mdash; tell me which fits</option></select></div>
+        <select id="f-cat" name="Category">{opts}</select></div>
+      <div class="field"><label for="f-plan">Plan</label><select id="f-plan" name="Plan">
+        <option value="Index {money(SITE["price_entry"])}/mo">Index &mdash; {money(SITE["price_entry"])}/mo</option>
+        <option value="Pro $49/mo">Pro &mdash; $49/mo</option>
+        <option value="Signal $149/mo">Signal &mdash; $149/mo</option>
+        <option value="Not sure yet">Not sure yet &mdash; tell me which fits</option></select></div>
       <div class="field"><label for="f-note">What do you make or sell?</label>
-        <textarea id="f-note" name="note" rows="4" placeholder="A couple of sentences is plenty. If you have a catalog feed or a sitemap, mention it."></textarea></div>
+        <textarea id="f-note" name="What they sell" rows="4" placeholder="A couple of sentences is plenty. If you have a catalog feed or a sitemap, mention it."></textarea></div>
       <div class="field"><label for="f-how">Anything else?</label>
-        <input id="f-how" name="how" placeholder="Optional &mdash; how you found us, questions, timing"></div>"""
+        <input id="f-how" name="Notes" placeholder="Optional &mdash; how you found us, questions, timing"></div>"""
 
-    if action:
-        form = f"""<form class="apply" method="post" action="{e(action)}"{enc} id="apply">
+    if endpoint:
+        # FormSubmit: _honey is the honeypot (bots fill it, people never see it),
+        # _captcha off because the honeypot already does that job without making
+        # a real applicant solve a puzzle, _next is our own thank-you page.
+        hp = e(F.get("honeypot") or "_honey")
+        form = f"""<form class="apply" method="POST" action="{e(endpoint)}" id="apply">
+      <input type="hidden" name="_subject" value="{e(F.get("subject") or (BRAND + " — new store application"))}">
+      <input type="hidden" name="_template" value="{e(F.get("template") or "table")}">
+      <input type="hidden" name="_captcha" value="{"true" if F.get("captcha") else "false"}">
+      <input type="hidden" name="_next" value="{BASE}/join/thanks/">
+      <div class="hp" aria-hidden="true">
+        <label for="f-hp">Leave this field empty</label>
+        <input id="f-hp" type="text" name="{hp}" tabindex="-1" autocomplete="off">
+      </div>
 {fields}
       <button class="btn btn-brand btn-lg" type="submit" style="width:100%">Send application</button>
       <p class="xs muted" style="margin:.85rem 0 0">No card needed. Nothing is charged until your page is live and you have approved it.</p>
@@ -925,11 +935,7 @@ def page_join():
         form = f"""<div class="apply">
       <span class="tag tag-brand">Opening to founding stores</span>
       <h3 style="margin:.7rem 0 .5rem">The form is not wired up yet</h3>
-      <p class="sm">Rather than show you a form that posts into a void, it is off until the inbox behind it is connected. It will be live shortly.</p>
-      <p class="sm">In the meantime the fastest way in is to contact {e(SITE["publisher"])} through
-        <a href="{e(SITE["publisher_url"])}">{e(host(SITE["publisher_url"]))}</a> with your store URL and the word
-        &ldquo;{e(BRAND)}&rdquo;. Founding listings are being reviewed now.</p>
-      <p class="xs muted" style="margin:.85rem 0 0">{len(CATS) - len([c for c in CATS if any(p.get("category")==c["slug"] for p in PRODUCTS)])} of {len(CATS)} categories still have no store in them.</p>
+      <p class="sm">Contact {e(SITE["publisher"])} through <a href="{e(SITE["publisher_url"])}">{e(host(SITE["publisher_url"]))}</a> with your store URL.</p>
     </div>"""
 
     ld = [ld_crumbs(trail),
@@ -1021,6 +1027,41 @@ def page_join():
     return write("join/index.html", head(f"Plug your store into {BRAND}",
         f"Apply to list your independent store. Hand-checked, month to month, no commission, no checkout between you and your customer. From {money(SITE['price_entry'])}.",
         "/join/", ld=ld) + body)
+
+def page_thanks():
+    trail = [("Home","/"),("Plug in","/join/"),("Received",None)]
+    body = f"""{header()}
+{crumbs(trail)}
+<main id="main"><div class="wrap narrow">
+  <section class="state" style="padding:46px 0 32px">
+    <p class="label">Application received</p>
+    <h1>Got it. <em>Now we go and check.</em></h1>
+    <p>Your application is in. A person reads every one of these, which is why it takes a couple of days rather than a couple of seconds.</p>
+  </section>
+
+  <div class="rule" style="margin-top:0"><h2>What happens from here</h2></div>
+  <div class="steps" style="margin-top:16px">
+    <div class="step"><div><h3>Within two business days</h3>
+      <p>We check that you are an independent seller, that you run your own checkout, and that your products and prices are current. If something does not add up we ask you rather than guess.</p></div></div>
+    <div class="step"><div><h3>Then we build your record</h3>
+      <p>Your page, your catalog read from your own feed, and your listing in every category, type and brand index it belongs in.</p></div></div>
+    <div class="step"><div><h3>You approve it before anyone sees it</h3>
+      <p>Nothing about your store is published until you have read it. Billing starts the day you go live, not before.</p></div></div>
+  </div>
+
+  <div class="note"><p class="sm"><b>Nothing arrived?</b> Check your spam folder for our reply, and add our address to your contacts. If you hear nothing in three business days, <a href="/contact/">chase us</a> &mdash; something went wrong and we would rather know.</p></div>
+
+  <div class="ledge">
+    <h2>While you wait</h2>
+    <p>Open your own store with JavaScript switched off. Whatever is still on screen is what a machine sees. It is the clearest two minutes you can spend on this.</p>
+    <span class="after"><a href="/for-brands/">Why that matters</a><a href="/">Browse the index</a><a href="/faq/">Questions</a></span>
+  </div>
+</div></main>
+{footer()}"""
+    return write("join/thanks/index.html", head(f"Application received | {BRAND}",
+        "Your application is in. A person reviews every one, usually within two business days.",
+        "/join/thanks/", extra='<meta name="robots" content="noindex, follow">',
+        ld=ld_crumbs(trail)) + body)
 
 def page_about():
     trail = [("Home","/"),("About",None)]
@@ -1696,6 +1737,7 @@ def main():
     made.append(page_pricing())
     made.append(page_how())
     made.append(page_join())
+    made.append(page_thanks())
     made.append(page_about())
     made.append(page_contact())
     made.append(page_advertise())

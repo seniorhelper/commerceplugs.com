@@ -8,6 +8,14 @@
   "founded": 2026,
   "publisher": "Eye To Ad Media",
   "publisher_url": "https://www.eyetoad.com",
-  "apply_endpoint": null,
-  "contact_email": null
+  "contact_email": "info@eyetoad.com",
+  "form": {
+    "provider": "formsubmit",
+    "endpoint": "https://formsubmit.co/info@eyetoad.com",
+    "alias_note": "Replace with https://formsubmit.co/<your-alias> once issued",
+    "subject": "Commerce Plugs \u2014 new store application",
+    "honeypot": "_honey",
+    "captcha": false,
+    "template": "table"
+  }
 }

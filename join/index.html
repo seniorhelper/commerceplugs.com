@@ -89,15 +89,35 @@
   <div class="shell" style="margin-top:34px;grid-template-columns:1.05fr .95fr;gap:44px">
     <div>
       <div class="rule" style="margin-top:0"><h2>Apply</h2><span class="n">takes about two minutes</span></div>
-      <div style="margin-top:18px"><div class="apply">
-      <span class="tag tag-brand">Opening to founding stores</span>
-      <h3 style="margin:.7rem 0 .5rem">The form is not wired up yet</h3>
-      <p class="sm">Rather than show you a form that posts into a void, it is off until the inbox behind it is connected. It will be live shortly.</p>
-      <p class="sm">In the meantime the fastest way in is to contact Eye To Ad Media through
-        <a href="https://www.eyetoad.com">eyetoad.com</a> with your store URL and the word
-        &ldquo;Commerce Plugs&rdquo;. Founding listings are being reviewed now.</p>
-      <p class="xs muted" style="margin:.85rem 0 0">13 of 16 categories still have no store in them.</p>
-    </div></div>
+      <div style="margin-top:18px"><form class="apply" method="POST" action="https://formsubmit.co/info@eyetoad.com" id="apply">
+      <input type="hidden" name="_subject" value="Commerce Plugs — new store application">
+      <input type="hidden" name="_template" value="table">
+      <input type="hidden" name="_captcha" value="false">
+      <input type="hidden" name="_next" value="https://commerceplugs.com/join/thanks/">
+      <div class="hp" aria-hidden="true">
+        <label for="f-hp">Leave this field empty</label>
+        <input id="f-hp" type="text" name="_honey" tabindex="-1" autocomplete="off">
+      </div>
+      <div class="field"><label for="f-store">Store name</label>
+        <input id="f-store" name="Store name" autocomplete="organization" required></div>
+      <div class="field"><label for="f-url">Store URL</label>
+        <input id="f-url" name="Store URL" type="url" inputmode="url" placeholder="https://" autocomplete="url" required></div>
+      <div class="field"><label for="f-email">Your email</label>
+        <input id="f-email" name="email" type="email" inputmode="email" autocomplete="email" required></div>
+      <div class="field"><label for="f-cat">Main category</label>
+        <select id="f-cat" name="Category"><option value="home-bath">Home &amp; Bath</option><option value="kitchen">Kitchen</option><option value="electronics">Electronics &amp; Accessories</option><option value="apparel">Apparel</option><option value="beauty">Beauty &amp; Personal Care</option><option value="outdoors-garden">Outdoors &amp; Garden</option><option value="pets">Pets</option><option value="toys-games">Toys &amp; Games</option><option value="sports-fitness">Sports &amp; Fitness</option><option value="office">Office &amp; Stationery</option><option value="tools-hardware">Tools &amp; Hardware</option><option value="food-drink">Food &amp; Drink</option><option value="jewelry-watches">Jewelry &amp; Watches</option><option value="art-collectibles">Art &amp; Collectibles</option><option value="baby-kids">Baby &amp; Kids</option><option value="auto-moto">Auto &amp; Moto</option></select></div>
+      <div class="field"><label for="f-plan">Plan</label><select id="f-plan" name="Plan">
+        <option value="Index $19.99/mo">Index &mdash; $19.99/mo</option>
+        <option value="Pro $49/mo">Pro &mdash; $49/mo</option>
+        <option value="Signal $149/mo">Signal &mdash; $149/mo</option>
+        <option value="Not sure yet">Not sure yet &mdash; tell me which fits</option></select></div>
+      <div class="field"><label for="f-note">What do you make or sell?</label>
+        <textarea id="f-note" name="What they sell" rows="4" placeholder="A couple of sentences is plenty. If you have a catalog feed or a sitemap, mention it."></textarea></div>
+      <div class="field"><label for="f-how">Anything else?</label>
+        <input id="f-how" name="Notes" placeholder="Optional &mdash; how you found us, questions, timing"></div>
+      <button class="btn btn-brand btn-lg" type="submit" style="width:100%">Send application</button>
+      <p class="xs muted" style="margin:.85rem 0 0">No card needed. Nothing is charged until your page is live and you have approved it.</p>
+    </form></div>
     </div>
 
     <div>

@@ -1334,3 +1334,7 @@ a[style*="--brand)"], .sheet-top a { color: var(--brand-ink); }
 }
 .apply input::placeholder, .apply textarea::placeholder { color: var(--muted); }
 .btn-lg { padding: .82rem 1.2rem; font-size: 1rem; }
+
+/* honeypot: off-screen rather than display:none, because some bots skip
+   hidden fields but still fill ones they can "see" in the DOM */
+.hp { position: absolute; left: -9999px; top: auto; width: 1px; height: 1px; overflow: hidden; }
