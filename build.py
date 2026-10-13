@@ -384,6 +384,12 @@ def page_home():
     spread_html = "".join(plate(x, i+1) for i, x in enumerate(spread))
 
     # four real listings, one per type, for the hero. No photo, no tile.
+    # the biggest types, as quick entries — fills the column beside the art and
+    # gives a shopper somewhere to go that is not a button
+    jump_html = "".join(
+        f'<a href="/t/{k}/">{e(v["name"])} <b>{len(v["items"])}</b></a>'
+        for k, v in list(TYPES.items())[:5])
+
     art = [x for x in spread if x.get("image")][:4]
     hero_tiles = "".join(
         f'<a class="htile" href="{e(x["url"])}" rel="nofollow noopener" target="_blank">'
@@ -417,6 +423,11 @@ def page_home():
         <a href="/contents/">Browse by type</a>
       </span>
       <p class="hero-trust">{socket_svg(20)} <span>Independent sellers only &middot; every link goes to their own checkout &middot; <b>0% commission</b></span></p>
+
+      <div class="hero-jump">
+        <span class="hero-jump-lab">Jump straight in</span>
+        <span class="hero-jump-row">{jump_html}</span>
+      </div>
     </div>
 
     <aside class="hero-art" aria-label="A sample of what is listed">

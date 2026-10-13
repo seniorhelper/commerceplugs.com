@@ -39,7 +39,7 @@ Type: **Bricolage Grotesque** for display, **Outfit** for everything else, both
 self-hosted in `assets/fonts/`. 10px radius, no shadows. The page is light: white
 masthead, light colophon, one dark band at the close.
 
-The mark is the **out-arrow** in an orange tile — every link on this site leaves
+The mark is the **out-arrow** in a violet tile — every link on this site leaves
 for the seller. Settled in the brand round; do not replace it.
 
 The **plug and socket are content icons, never the logo.** They appear only

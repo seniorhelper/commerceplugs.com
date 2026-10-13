@@ -1480,3 +1480,32 @@ a[style*="--brand)"], .sheet-top a { color: var(--brand-ink); }
 .bleed-ink p.label, .bleed-ink .label, .bleed-ink .eyebrow, .bleed-ink .kick { color: #EFE7FF; }
 .bleed-red .claim em, .bleed-red a:hover { color: #B494FF; }
 .htile:hover .htile-cap { color: #5A21D6; }
+
+/* ============================================================
+   HERO BALANCE
+   The copy column was centring against a taller art column,
+   which opened a gap above the headline. Top-align both, then
+   fill the remaining column with something useful rather than
+   padding: the five biggest product types, as entries.
+   ============================================================ */
+@media (min-width: 1021px) {
+  .hero { align-items: start; }
+  .hero-copy { align-self: start; padding-top: 4px; }
+}
+.hero-jump { margin-top: 1.7rem; padding-top: 1.3rem; border-top: 1px solid var(--line); }
+.hero-jump-lab {
+  display: block; font: 600 .74rem var(--sans); letter-spacing: .09em;
+  text-transform: uppercase; color: var(--muted); margin-bottom: .62rem;
+}
+.hero-jump-row { display: flex; flex-wrap: wrap; gap: 7px; }
+.hero-jump-row a {
+  display: inline-flex; align-items: baseline; gap: .4rem;
+  font: 500 .88rem var(--sans); color: var(--ink-2);
+  border: 1px solid var(--line); border-radius: 999px; padding: .4rem .78rem;
+  background: var(--paper);
+}
+.hero-jump-row a b { font-weight: 600; color: var(--accent-ink); font-variant-numeric: tabular-nums; }
+.hero-jump-row a:hover {
+  border-color: var(--brand); color: var(--brand-ink); background: var(--brand-soft); text-decoration: none;
+}
+.hero-jump-row a:hover b { color: var(--brand-ink); }
