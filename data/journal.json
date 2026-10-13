@@ -1,0 +1,74 @@
+[
+  {
+    "slug": "what-a-365-product-catalog-says-about-price",
+    "title": "What a 365-product accessible-bathing catalog says about price",
+    "kicker": "From the index",
+    "date": "2026-10-13",
+    "updated": "2026-10-13",
+    "summary": "We indexed every published product from one independent retailer and looked at what the numbers actually show about how accessible bathing is priced.",
+    "tags": ["data", "home-bath", "pricing"],
+    "data_post": true,
+    "body": [
+      ["p", "Most writing about bathroom remodelling quotes a single average and moves on. An average is the least useful number you can publish about a catalog like this one, because the catalog is not one product. It is a shower seat at a hundred and eighty dollars and a steam enclosure at nine thousand, sold by the same shop to the same customer on the same afternoon."],
+      ["h2", "What we counted"],
+      ["p", "Showers4Less, an independent retailer in Denver operated by Aging Safely Baths, publishes a public catalog. We read it in full on the date below, kept every item that carries a real published price, and classified each by the type the seller themselves assigns it. Nothing here is estimated or modelled. Where the seller publishes nothing, we publish nothing."],
+      ["stats", null],
+      ["h2", "The spread is the finding"],
+      ["p", "Price in this category does not cluster. It separates into bands that correspond to how much building work the product implies. Parts and fittings sit lowest, because they drop into an opening that already exists. Pans and doors sit in the middle, because they replace a component without moving plumbing. Complete systems and steam sit highest, because buying one is a decision about the room rather than about the fixture."],
+      ["types", null],
+      ["p", "That matters for a shopper because the band tells you what question you are actually answering. If you are looking at seats and grab bars you are solving a safety problem this month. If you are looking at roll-in systems you are rebuilding a room, and the price of the unit is a fraction of what the project costs."],
+      ["h2", "Brand concentration"],
+      ["p", "One other thing the data shows plainly: an independent specialist is not carrying forty brands. It carries a handful, deeply. That is the opposite of how a marketplace listing page looks, and it is most of why a specialist is worth asking."],
+      ["brands", null],
+      ["h2", "Why we publish this"],
+      ["p", "Because it is checkable. Every figure above is derived from records published on this site, each with a verification date, and the underlying data is available as an open feed. If the catalog changes, these numbers change with it, and the date on the page tells you which catalog you are reading about."]
+    ]
+  },
+  {
+    "slug": "why-your-store-may-be-invisible-to-ai-assistants",
+    "title": "Why your store may be invisible to AI assistants",
+    "kicker": "For brands",
+    "date": "2026-10-13",
+    "updated": "2026-10-13",
+    "summary": "A practical test you can run on your own storefront in about a minute, and what to do about the result.",
+    "tags": ["machine-readability", "for-brands"],
+    "body": [
+      ["p", "Here is a test worth a minute of your time. Open your own store in a browser with JavaScript switched off. Whatever is still on the screen is roughly what a machine sees when it fetches your page. For a lot of modern storefronts, what is left is a logo and a spinner."],
+      ["h2", "Three questions, in order"],
+      ["p", "Whether an assistant can recommend your store comes down to three things, and they happen in sequence. Failing the first makes the other two irrelevant."],
+      ["h3", "Can it be fetched?"],
+      ["p", "The crawlers behind the major assistants request your page and read what comes back in that first response. They do not wait for a framework to boot, they do not click, they do not log in, and they do not run the script that fills your product grid. If your catalog is drawn client-side, there is nothing in that response to read."],
+      ["h3", "Can it be parsed?"],
+      ["p", "A price is only a price if it is characters in the HTML. Rendered into an image, injected by a script, or shown only after a variant is selected, it cannot be quoted. A machine that cannot state your price will quote a competitor who publishes theirs plainly. The same goes for sizes, materials, shipping and returns."],
+      ["h3", "Can it be trusted as current?"],
+      ["p", "The ugliest failure in machine-generated recommendations is not an invented store. It is a real store with a dead price or a product that sold out eighteen months ago. Undated records get treated as risky, and risky records get skipped. A visible verification date is cheap to publish and does more work than almost anything else on the page."],
+      ["h2", "What actually fixes it"],
+      ["p", "Server-render the facts. Write prices, dimensions and policies as text in the initial response, and mark them up in schema.org as well, because the markup is what makes you eligible for product feed programs. Publish a catalog feed at a stable URL that does not move. Put a date on the record and keep it current."],
+      ["p", "None of that is exotic, and none of it requires replatforming. It does require someone to do it and keep doing it, which is the part most independent stores never get to."],
+      ["h2", "What we will not claim"],
+      ["p", "Nobody can promise you a citation in an assistant, a search ranking, or a sale, and you should be suspicious of anyone who does — those systems are not ours to control. What can be promised is that every fact about your store is published in a form a machine can fetch, parse and date. That is the part that is currently missing, and it is the part we do."]
+    ]
+  },
+  {
+    "slug": "how-we-verify-a-store",
+    "title": "How we verify a store, and what we refuse to publish",
+    "kicker": "Editorial standards",
+    "date": "2026-10-13",
+    "updated": "2026-10-13",
+    "summary": "The checks every listing passes before it appears, what a blank field means, and the things that will never appear on this index at any price.",
+    "tags": ["standards", "trust"],
+    "body": [
+      ["p", "An index is only worth reading if the reader knows what its entries mean. These are the rules this one runs on. They are published here so you can hold us to them."],
+      ["h2", "What we check before a store is listed"],
+      ["list", ["That it is an independent store rather than a marketplace reseller front.", "That it controls its own checkout.", "That the products are real and the prices shown on its own site are current.", "That it ships to at least one country reliably.", "Who legally operates it, where it ships from, and in what currency it sells."]],
+      ["h2", "What a blank field means"],
+      ["p", "It means we have not confirmed it. A field we have not verified reads “not verified” rather than being filled in with a plausible guess, and a store with no connected catalog publishes no prices rather than estimated ones. If this index ever looks smaller than a competitor, that is the reason."],
+      ["h2", "Where the product data comes from"],
+      ["p", "Prices, stock and specifications are read from each seller's own public catalog and carry the date we read them. We do not retype them, we do not adjust them, and we do not mark them up, because we take no commission and have nothing to gain from a different number. Check the store for the live figure before you buy."],
+      ["h2", "What will never appear here"],
+      ["list", ["Invented products, estimated prices, or stock levels we have not checked.", "Reviews we did not receive.", "Affiliate links inside listings.", "Paid placement presented as editorial. Anything sponsored is labelled as sponsored.", "A store we could not verify, listed as though we had."]],
+      ["h2", "Corrections"],
+      ["p", "If something here is wrong, tell us. We will correct it and re-date the record, and the date on the page will show that it changed. A correction is not an embarrassment; an index that never corrects anything is not being checked."]
+    ]
+  }
+]

@@ -11,6 +11,7 @@ ROOT = os.path.dirname(os.path.abspath(__file__))
 OUT  = os.path.join(ROOT, "preview")
 COPY = ["assets", "feeds", ".well-known", "c", "t", "b", "stores", "search",
         "contents", "for-brands", "pricing", "how-it-works", "join", "about",
+        "contact", "advertise", "faq", "journal", "favicon.ico", "site.webmanifest",
         "index.html", "404.html", "search-index.json", "llms.txt", "sitemap.xml",
         "robots.txt"]
 

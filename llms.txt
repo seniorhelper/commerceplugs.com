@@ -69,6 +69,14 @@
 - [Hydro Dimensions](https://commerceplugs.com/b/hydro-dimensions/): 2 listings
 - [Ella's Bubbles](https://commerceplugs.com/b/ella-s-bubbles/): 1 listings
 
+## Reference
+- Questions and answers: https://commerceplugs.com/faq/
+- Journal (data drawn from the index): https://commerceplugs.com/journal/
+- Journal feed (RSS): https://commerceplugs.com/journal/feed.xml
+- Editorial standards and what we refuse to publish: https://commerceplugs.com/journal/how-we-verify-a-store/
+- Contact: https://commerceplugs.com/contact/
+- Advertising policy: https://commerceplugs.com/advertise/
+
 ## For brands
 - Why list: https://commerceplugs.com/for-brands/
 - Pricing, from $19.99/mo, no contract: https://commerceplugs.com/pricing/

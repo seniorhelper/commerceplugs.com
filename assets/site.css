@@ -980,3 +980,23 @@ img, svg { max-width: 100%; height: auto; }
 .claim em { font-style: italic; color: var(--brand); }
 .bleed-ink .claim em { color: var(--mast-accent); }
 .bleed-red .claim em { color: #fff; font-style: italic; }
+
+/* ---- questions: each answer standing on its own, for voice and for quoting ---- */
+.faq .qa { border-bottom: 1px solid var(--line); padding: 20px 0; }
+.faq .qa:first-child { border-top: 3px solid var(--ink); box-shadow: 0 2px 0 -1px var(--ink); }
+.faq .qa h2 { font-size: 1.22rem; margin: 0 0 .45rem; letter-spacing: -.012em; }
+.faq .qa p { margin: 0; color: var(--ink-2); font-size: 1.02rem; max-width: 66ch; }
+
+/* ---- journal ---- */
+.jlist { border-top: 3px solid var(--ink); box-shadow: 0 2px 0 -1px var(--ink); }
+.jrow { padding: 22px 0; border-bottom: 1px solid var(--line); }
+.jrow h2 { font-size: clamp(1.3rem, 2.6vw, 1.8rem); margin: .1rem 0 .4rem; letter-spacing: -.015em; }
+.jrow p { margin: 0 0 .4rem; color: var(--ink-2); max-width: 64ch; }
+.post { max-width: 68ch; }
+.post h2 { font-size: 1.5rem; }
+.post h3 { font-size: 1.14rem; }
+.post p { font-size: 1.06rem; line-height: 1.68; }
+.post ul { padding-left: 1.1rem; }
+.post li { margin-bottom: .5rem; font-size: 1.04rem; line-height: 1.6; }
+.post hr { border: 0; border-top: 1px solid var(--line); margin: 22px 0 24px; }
+.post .figures, .post .register, .post .index-list { max-width: none; }

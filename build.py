@@ -14,6 +14,7 @@ SITE = json.load(open(D("data/site.json")))
 CATS = json.load(open(D("data/categories.json")))
 STORES = json.load(open(D("data/stores.json")))
 PRODUCTS = json.load(open(D("data/products.json")))
+JOURNAL  = sorted(json.load(open(D("data/journal.json"))), key=lambda x: x["date"], reverse=True)
 
 BASE = "https://" + SITE["domain"]
 BRAND = SITE["brand"]
@@ -78,9 +79,20 @@ def money(p):
     except Exception: return "$" + str(p)
 
 # ---------------------------------------------------------------- chrome
-def head(title, desc, path, extra="", ld=None):
+ORG = {"@context":"https://schema.org","@type":"Organization","@id":BASE+"/#org",
+       "name":BRAND,"url":BASE+"/","description":SITE["pitch"],
+       "logo":{"@type":"ImageObject","url":BASE+"/assets/icons/icon-512.png","width":512,"height":512},
+       "image":BASE+"/assets/og/default.jpg",
+       "founder":{"@type":"Organization","name":SITE["publisher"],"url":SITE["publisher_url"]},
+       "foundingDate":str(SITE["founded"]),
+       "knowsAbout":["independent retail","ecommerce directories","product data","machine-readable commerce"],
+       "contactPoint":{"@type":"ContactPoint","contactType":"customer support",
+                       "url":BASE+"/contact/","availableLanguage":"English"}}
+
+def head(title, desc, path, extra="", ld=None, og="default", og_alt=None):
     url = BASE + path
     blocks = ""
+    ld = ([ld] if isinstance(ld, dict) else list(ld or [])) + [ORG]
     if ld:
         for obj in (ld if isinstance(ld, list) else [ld]):
             blocks += '<script type="application/ld+json">%s</script>\n' % json.dumps(obj, separators=(",", ":"))
@@ -93,19 +105,34 @@ def head(title, desc, path, extra="", ld=None):
 <meta name="description" content="{e(desc)}">
 <meta name="robots" content="index, follow, max-image-preview:large">
 <link rel="canonical" href="{url}">
-<meta name="theme-color" content="#0B0B0F">
+<meta name="theme-color" content="#16181C">
+<meta name="color-scheme" content="light dark">
+<link rel="icon" href="/favicon.ico" sizes="32x32">
+<link rel="icon" href="/assets/icons/icon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="/assets/icons/apple-touch-icon.png">
+<link rel="manifest" href="/site.webmanifest">
 <meta property="og:site_name" content="{e(BRAND)}">
 <meta property="og:title" content="{e(title)}">
 <meta property="og:description" content="{e(desc)}">
 <meta property="og:url" content="{url}">
 <meta property="og:type" content="website">
+<meta property="og:locale" content="en_US">
+<meta property="og:image" content="{BASE}/assets/og/{og}.jpg">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="{e(og_alt or title)}">
 <meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="{e(title)}">
+<meta name="twitter:description" content="{e(desc)}">
+<meta name="twitter:image" content="{BASE}/assets/og/{og}.jpg">
 <link rel="preload" href="/assets/fonts/Newsreader-normal-400-5.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="preload" href="/assets/fonts/Archivo-normal-400-1.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="stylesheet" href="/assets/fonts.css">
 <link rel="stylesheet" href="/assets/site.css">
 <script src="/assets/app.js" defer></script>
 <link rel="alternate" type="application/json" href="{BASE}/feeds/products.json" title="Product feed">
+<link rel="alternate" type="application/rss+xml" href="{BASE}/journal/feed.xml" title="{e(BRAND)} Journal">
+<link rel="sitemap" type="application/xml" href="{BASE}/sitemap.xml">
 {blocks}{extra}</head>
 <body>
 <a class="skip" href="#main">Skip to content</a>
@@ -142,9 +169,9 @@ def footer():
     cols = ""
     for group, links in [
         ("Shop", [("Contents","/contents/"),("All stores","/stores/"),("Search","/search/"),("Recently added","/stores/")]),
-        ("For brands", [("Why list here","/for-brands/"),("Pricing","/pricing/"),("How it works","/how-it-works/"),("Get listed","/join/")]),
+        ("For brands", [("Why list here","/for-brands/"),("Pricing","/pricing/"),("How it works","/how-it-works/"),("Advertise","/advertise/"),("Get listed","/join/")]),
         ("Machine", [("Store feed","/feeds/stores.json"),("Product feed","/feeds/products.json"),("MCP server","/.well-known/mcp/server.json"),("llms.txt","/llms.txt")]),
-        ("Company", [("About","/about/"),("Contact","/join/"),("Sitemap","/sitemap.xml"),("Publisher",SITE["publisher_url"])]),
+        ("Company", [("About","/about/"),("Journal","/journal/"),("Questions","/faq/"),("Contact","/contact/"),("Advertise","/advertise/"),("Publisher",SITE["publisher_url"])]),
     ]:
         items = "".join(f'<li><a href="{l}">{e(n)}</a></li>' for n, l in links)
         cols += f'<div><h4>{e(group)}</h4><ul>{items}</ul></div>'
@@ -415,7 +442,7 @@ def page_home():
 {footer()}"""
     return write("index.html", head(f"{BRAND} \u2014 {SITE['tagline']}",
         "An index of independent online stores. Search real sellers and buy direct from the brand. No marketplace fees, no middleman checkout, no commission.",
-        "/", ld=ld) + body)
+        "/", ld=ld, og="default") + body)
 
 def page_category(c):
     trail = [("Home","/"),("Index","/#index"),(c["name"],None)]
@@ -478,7 +505,8 @@ def page_category(c):
     return write(f"c/{c['slug']}/index.html",
         head(f"{c['name']} from independent stores | {BRAND}",
              (c["blurb"] + f" {len(prods)} listings from independent sellers, bought direct from the brand.")[:158],
-             f"/c/{c['slug']}/", ld=ld) + body)
+             f"/c/{c['slug']}/", ld=ld, og=f"cat-{c['slug']}",
+             og_alt=f"{c['name']} on the {BRAND} index") + body)
 
 def page_store(s):
     trail = [("Home","/"),("Register","/stores/"),(s["name"],None)]
@@ -593,7 +621,8 @@ def page_store(s):
     return write(f"stores/{s['slug']}/index.html",
         head(f"{s['name']} \u2014 independent store | {BRAND}",
              (s.get("summary") or f"{s['name']} is an independent online store at {host(s['url'])}.")[:158],
-             f"/stores/{s['slug']}/", ld=ld) + body)
+             f"/stores/{s['slug']}/", ld=ld, og=f"store-{s['slug']}",
+             og_alt=f"{s['name']}, an independent store on the {BRAND} index") + body)
 
 def page_stores():
     trail = [("Home","/"),("Register",None)]
@@ -1013,7 +1042,8 @@ def page_facet(kind, key, rec):
 </div></main>
 {footer()}"""
     return write(f"{base.strip('/')}/{key}/index.html",
-        head(f"{name} from independent stores | {BRAND}", lede[:158], f"{base}{key}/", ld=ld) + body)
+        head(f"{name} from independent stores | {BRAND}", lede[:158], f"{base}{key}/", ld=ld,
+             og=f"{'type' if kind=='t' else 'brand'}-{key}", og_alt=f"{name} on the {BRAND} index") + body)
 
 def page_indexes():
     """A contents page listing every way into the index."""
@@ -1047,6 +1077,302 @@ def page_indexes():
     return write("contents/index.html", head(f"Contents \u2014 every category, type and brand | {BRAND}",
         f"The full contents of the index: {len(CATS)} categories, {len(TYPES)} product types and {len(BRANDS)} brands carried by independent stores.",
         "/contents/", ld=ld_crumbs(trail)) + body)
+
+def page_contact():
+    trail = [("Home","/"),("Contact",None)]
+    email = SITE.get("contact_email")
+    reach = (f'<a href="mailto:{e(email)}">{e(email)}</a>' if email
+             else f'through <a href="{e(SITE["publisher_url"])}">{e(host(SITE["publisher_url"]))}</a>, the publisher')
+    body = f"""{header()}
+{crumbs(trail)}
+<main id="main"><div class="wrap">
+  <p class="orient"><b>{len(STORES)}</b> store{"s" if len(STORES)!=1 else ""} on the record<span class="sep">/</span>
+    corrections are re-dated, not quietly edited</p>
+  <section class="state" style="padding:34px 0 28px">
+    <p class="label">Contact</p>
+    <h1>Reach a person.</h1>
+    <p>There is no ticket queue here and no chatbot. Mail reaches {e(SITE["publisher"])}, which publishes this index.</p>
+  </section>
+
+  <div class="rule"><h2>What you probably want</h2><span class="n">pick the nearest one</span></div>
+  <div class="grid g2" style="gap:26px;margin-top:18px">
+    <div class="card">
+      <h3>List your store</h3>
+      <p class="sm">Independent sellers only, hand-checked, month to month. Start with the application rather than mail \u2014 it asks for what we need.</p>
+      <a class="btn btn-sm btn-brand" href="/join/">Apply to list</a>
+    </div>
+    <div class="card">
+      <h3>Correct something about your store</h3>
+      <p class="sm">A wrong price, a stale description, a field marked verified that is not. Tell us what is wrong and we will fix it and re-date the record. You do not need to be a customer to report an error.</p>
+      <a class="btn btn-sm btn-ghost" href="/join/">Claim your page</a>
+    </div>
+    <div class="card">
+      <h3>Advertise</h3>
+      <p class="sm">We sell listings and labelled sponsorship. We do not sell ranking, and we do not sell placement disguised as editorial.</p>
+      <a class="btn btn-sm btn-ghost" href="/advertise/">What we sell</a>
+    </div>
+    <div class="card">
+      <h3>Use our data</h3>
+      <p class="sm">The store and product feeds are public and documented, licensed CC-BY-4.0. You do not need permission, only attribution.</p>
+      <a class="btn btn-sm btn-ghost" href="/feeds/README.md">Feed documentation</a>
+    </div>
+  </div>
+
+  <div class="rule"><h2>The details</h2></div>
+  <dl class="spec">
+    <div><dt>Published by</dt><dd><a href="{e(SITE["publisher_url"])}">{e(SITE["publisher"])}</a></dd></div>
+    <div><dt>Reach us</dt><dd>{reach}</dd></div>
+    <div><dt>Response time</dt><dd>Two business days for applications. Corrections are treated as urgent.</dd></div>
+    <div><dt>Press and data questions</dt><dd>Same address. The figures on this site are all derived from the public feeds, so most questions can be answered from <a href="/feeds/README.md">the feed documentation</a> faster than we can answer them.</dd></div>
+  </dl>
+
+  <div class="note"><p class="sm"><b>We will never ask you</b> for your store password, your payment processor login or your domain registrar credentials. If anyone claiming to be us does, it is not us.</p></div>
+</div></main>
+{footer()}"""
+    return write("contact/index.html", head(f"Contact | {BRAND}",
+        f"Reach {BRAND}: list a store, correct a record, ask about advertising, or use the open data feeds.",
+        "/contact/", ld=ld_crumbs(trail)) + body)
+
+def page_advertise():
+    trail = [("Home","/"),("Advertise",None)]
+    body = f"""{header()}
+{crumbs(trail)}
+<main id="main"><div class="wrap">
+  <p class="orient">labelled placements only<span class="sep">/</span>
+    ranking is <b>not</b> for sale<span class="sep">/</span>no affiliate links in listings</p>
+  <section class="state" style="padding:34px 0 28px">
+    <p class="label">Advertise</p>
+    <h1>We sell attention, not credibility.</h1>
+    <p>Everything on this page is bought in the open and labelled where it appears. The order of the index is never for sale, because an index whose order can be bought is worth nothing to the reader and therefore nothing to you.</p>
+  </section>
+</div>
+
+<div class="bleed bleed-green"><div class="wrap">
+  <div class="figures">
+    <div class="figure"><span class="v">0%</span><span class="k">commission on your sales</span></div>
+    <div class="figure"><span class="v">0</span><span class="k">affiliate links in listings</span></div>
+    <div class="figure"><span class="v">100%</span><span class="k">of paid placement labelled</span></div>
+    <div class="figure"><span class="v">{money(SITE["price_entry"])}</span><span class="k">entry listing, per month</span></div>
+  </div>
+</div></div>
+
+<div class="wrap">
+  <div class="rule"><h2>What you can buy</h2><span class="n">all of it labelled, all of it cancellable</span></div>
+  <dl class="spec">
+    <div><dt>A listing</dt><dd>Your store on the index with a page you control the facts of, from {money(SITE["price_entry"])} a month. This is not advertising \u2014 it is the product \u2014 but it is the thing most people are asking about. <a href="/pricing/">See the tiers \u2192</a></dd></div>
+    <div><dt>Sponsored placement</dt><dd>A fixed slot on a category, type or brand page, marked <em>Sponsored</em> in the same type size as everything around it. It sits outside the ranked list rather than inside it, so it never displaces a result a reader was looking for.</dd></div>
+    <div><dt>Journal sponsorship</dt><dd>A single labelled sponsor per article, named at the top. No sponsored articles, no paid mentions inside the text, and sponsors see no copy before it is published.</dd></div>
+    <div><dt>Feed sponsorship</dt><dd>Attribution in the open data feeds and their documentation, for tools and services built on top of the index.</dd></div>
+  </dl>
+
+  <div class="rule"><h2>What you cannot buy</h2><span class="n">at any price</span></div>
+  <div class="split pair">
+    <div>
+      <h3>Not for sale</h3>
+      <ul>
+        <li>Position in the index, or in any ranked or sorted list.</li>
+        <li>Removal of a competitor, or of a correction about you.</li>
+        <li>A verification mark. Verification is a check we perform, not a badge we sell.</li>
+        <li>Editorial coverage, or changes to an article after publication.</li>
+        <li>An unlabelled placement of any kind.</li>
+      </ul>
+    </div>
+    <div>
+      <h3>Always true</h3>
+      <ul>
+        <li>Paid placement is labelled where a reader sees it, not only in a policy page.</li>
+        <li>Advertisers get the same record accuracy as everyone else, no better.</li>
+        <li>Cancel any time; nothing here runs on a term.</li>
+        <li>Your data stays exportable, including on the way out.</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="rule"><h2>Who reads this</h2></div>
+  <p>Two audiences, reading the same pages. Shoppers arriving on a category, type or brand page with a specific thing in mind. And machines \u2014 the crawlers and assistants that read this index as a source, which is the whole reason it is built the way it is. We publish real figures rather than a media kit: the index currently holds <b>{len(STORES)}</b> store{"s" if len(STORES)!=1 else ""}, <b>{len(PRODUCTS)}</b> listings and <b>{len(TYPES)}</b> product types, compiled {TODAY}. When those numbers are small, they will say so.</p>
+
+  <div class="ledge">
+    <h2>Interested?</h2>
+    <p>Tell us which store, which category, and what you are trying to achieve. If a listing would serve you better than a placement, we will say so.</p>
+    <span class="after"><a href="/contact/">Get in touch</a><a href="/pricing/">See the tiers</a><a href="/join/">Apply to list</a></span>
+  </div>
+</div></main>
+{footer()}"""
+    return write("advertise/index.html", head(f"Advertise on {BRAND}",
+        "Labelled placements only. Ranking is never for sale. What you can buy on the index, what you cannot, and the real figures.",
+        "/advertise/", ld=ld_crumbs(trail)) + body)
+
+FAQS = [
+ ("What is Commerce Plugs?",
+  "Commerce Plugs is an index of independent online stores. You search it, find the product you want, and then buy it on the seller's own website. It is not a marketplace: there is no checkout here, no commission is taken on any sale, and every listing links directly to the store that sells it."),
+ ("Do you sell anything directly?",
+  "No. We never handle payment and we hold no inventory. Every link goes to the independent store that sells the item, and you buy from them under their terms, with their returns policy and their customer service."),
+ ("Do you take a commission or add a markup?",
+  "No. We take no commission, no referral fee and no cut of any sale, and we run no affiliate links inside listings. Nothing on the index is marked up to pay us. Stores pay a flat monthly fee to be listed, and that is the entire business model."),
+ ("How do you decide what order things appear in?",
+  "Position on the index is not for sale at any price. Paid placement exists, but it sits outside the ranked lists and is labelled as sponsored where you see it, in the same type size as everything around it."),
+ ("Where do your prices come from, and are they current?",
+  "Prices, stock and specifications are read from each seller's own public catalog and carry the date we read them. We do not retype or adjust them. Because a store can change a price at any time, you should always check the figure on the store's own page before you buy."),
+ ("What does it mean when a field says 'not verified'?",
+  "It means exactly that: we have not confirmed it with the store. We publish a blank rather than a plausible guess. Likewise a store that has not connected a product feed shows no prices at all, rather than estimated ones."),
+ ("How does a store get listed?",
+  "A store applies, and every applicant is checked by hand. We confirm that it is an independent seller rather than a marketplace reseller, that it controls its own checkout, that its products and prices are real, and that it ships somewhere reliably. Listing starts at $19.99 a month with no contract and no minimum term."),
+ ("Is there a free listing?",
+  "No. There is no free tier, because a free listing that nobody maintains is the thing that does not work — it goes stale, and a stale record is worse than no record."),
+ ("Can I use your data?",
+  "Yes. The store and product feeds are public, documented and licensed CC-BY-4.0, so you can read and reuse them with attribution. There is also an MCP server definition, so an AI assistant can query the index directly rather than relying on having crawled it."),
+ ("How do I correct something that is wrong about my store?",
+  "Tell us and we will fix it and re-date the record. You do not have to be a paying listing to get an error corrected, and you do not have to be the store owner to report one."),
+]
+
+def page_faq():
+    trail = [("Home","/"),("Questions",None)]
+    items = "".join(
+        f'<div class="qa" id="q{i+1}"><h2>{e(q)}</h2><p>{e(a)}</p></div>'
+        for i, (q, a) in enumerate(FAQS))
+    ld = [ld_crumbs(trail),
+          {"@context":"https://schema.org","@type":"FAQPage",
+           "mainEntity":[{"@type":"Question","name":q,
+                          "acceptedAnswer":{"@type":"Answer","text":a}} for q, a in FAQS]},
+          {"@context":"https://schema.org","@type":"WebPage","@id":BASE+"/faq/#page",
+           "name":f"Questions about {BRAND}","url":BASE+"/faq/",
+           "speakable":{"@type":"SpeakableSpecification","cssSelector":[".qa h2",".qa p"]}}]
+    body = f"""{header()}
+{crumbs(trail)}
+<main id="main"><div class="wrap narrow">
+  <section class="state" style="padding:34px 0 26px">
+    <p class="label">Questions</p>
+    <h1>Straight answers.</h1>
+    <p>Each answer below is written to stand on its own, so it reads correctly whether you are scanning the page, hearing it read aloud, or getting it quoted back to you by an assistant.</p>
+  </section>
+  <div class="rule" style="margin-top:0"><h2>Common questions</h2><span class="n">{len(FAQS)} answered</span></div>
+  <div class="faq">{items}</div>
+  <div class="ledge">
+    <h2>Something not answered here?</h2>
+    <p>Ask a person. Corrections about a store are treated as urgent.</p>
+    <span class="after"><a href="/contact/">Contact</a><a href="/how-it-works/">How it works</a><a href="/about/">About</a></span>
+  </div>
+</div></main>
+{footer()}"""
+    return write("faq/index.html", head(f"Questions about {BRAND}",
+        "What the index is, how prices are sourced, what 'not verified' means, how stores get listed, and what is never for sale.",
+        "/faq/", ld=ld) + body)
+
+def _stats_block():
+    """Real figures, computed at build time. A data post that hardcodes its
+    numbers goes stale silently; this one cannot."""
+    pr = sorted(float(x["price"]) for x in PRODUCTS if x.get("price"))
+    if not pr: return ""
+    mid = pr[len(pr)//2]
+    return f"""<div class="figures" style="margin:20px 0 26px">
+  <div class="figure"><span class="v">{len(PRODUCTS)}</span><span class="k">priced listings read</span></div>
+  <div class="figure"><span class="v">{len(TYPES)}</span><span class="k">product types</span></div>
+  <div class="figure"><span class="v">{money_mono(mid)}</span><span class="k">median listing</span></div>
+  <div class="figure"><span class="v">{money_mono(pr[0])}\u2013{money_mono(pr[-1])}</span><span class="k">full range</span></div>
+</div>"""
+
+def _types_block():
+    rows = ""
+    for k, v in list(TYPES.items())[:12]:
+        pr = sorted(float(x["price"]) for x in v["items"] if x.get("price"))
+        if not pr: continue
+        rows += (f'<tr><td class="ix-n">{len(v["items"]):02d}</td>'
+                 f'<td class="nm"><a href="/t/{k}/">{e(v["name"])}</a></td>'
+                 f'<td class="num">{money_mono(pr[0])}</td>'
+                 f'<td class="num">{money_mono(pr[len(pr)//2])}</td>'
+                 f'<td class="num">{money_mono(pr[-1])}</td></tr>')
+    return (f'<table class="register" style="margin:18px 0 24px"><thead><tr><th>n</th><th>Type</th>'
+            f'<th class="num">Lowest</th><th class="num">Median</th><th class="num">Highest</th>'
+            f'</tr></thead><tbody>{rows}</tbody></table>')
+
+def _brands_block():
+    return ('<div class="index-list" style="margin:16px 0 24px">' +
+            "".join(index_entry(v["name"], f"/b/{k}/", len(v["items"])) for k, v in BRANDS.items()) +
+            "</div>")
+
+BLOCKS = {"stats": _stats_block, "types": _types_block, "brands": _brands_block}
+
+def render_body(body):
+    out = ""
+    for kind, val in body:
+        if kind == "p":    out += f"<p>{e(val)}</p>"
+        elif kind == "h2": out += f'<h2 style="margin-top:1.8rem">{e(val)}</h2>'
+        elif kind == "h3": out += f'<h3 style="margin-top:1.2rem">{e(val)}</h3>'
+        elif kind == "list": out += "<ul>" + "".join(f"<li>{e(x)}</li>" for x in val) + "</ul>"
+        elif kind in BLOCKS: out += BLOCKS[kind]()
+    return out
+
+def page_post(post):
+    trail = [("Home","/"),("Journal","/journal/"),(post["title"],None)]
+    others = [x for x in JOURNAL if x["slug"] != post["slug"]][:2]
+    more = "".join(
+        f'<div class="card"><p class="label">{e(x["kicker"])}</p>'
+        f'<h3 style="margin:.2rem 0 .4rem"><a href="/journal/{x["slug"]}/">{e(x["title"])}</a></h3>'
+        f'<p class="sm muted" style="margin:0">{e(x["summary"])}</p></div>' for x in others)
+    ld = [ld_crumbs(trail),
+          {"@context":"https://schema.org","@type":"Article",
+           "headline":post["title"],"description":post["summary"],
+           "datePublished":post["date"],"dateModified":post.get("updated", post["date"]),
+           "url":f"{BASE}/journal/{post['slug']}/",
+           "mainEntityOfPage":{"@type":"WebPage","@id":f"{BASE}/journal/{post['slug']}/"},
+           "image":f"{BASE}/assets/og/default.jpg",
+           "keywords":", ".join(post.get("tags", [])),
+           "author":{"@type":"Organization","name":BRAND,"url":BASE+"/"},
+           "publisher":{"@id":BASE+"/#org"},
+           "isAccessibleForFree":True,
+           "speakable":{"@type":"SpeakableSpecification","cssSelector":[".post h1",".post > p"]}}]
+    body = f"""{header()}
+{crumbs(trail)}
+<main id="main"><div class="wrap narrow">
+  <p class="orient"><b>{e(post["kicker"])}</b><span class="sep">/</span>
+    published <b>{e(post["date"])}</b>
+    {f'<span class="sep">/</span>updated <b>{e(post["updated"])}</b>' if post.get("updated") and post["updated"] != post["date"] else ""}
+    {'<span class="sep">/</span>figures recomputed at build' if post.get("data_post") else ""}</p>
+  <article class="post">
+    <h1 style="margin:28px 0 .8rem">{e(post["title"])}</h1>
+    <p style="font-size:1.15rem;color:var(--ink-2);max-width:60ch">{e(post["summary"])}</p>
+    <hr>
+    {render_body(post["body"])}
+  </article>
+  {f'<div class="rule"><h2>Also in the journal</h2></div><div class="grid g2" style="gap:18px;margin-top:16px">{more}</div>' if more else ""}
+</div></main>
+{footer()}"""
+    return write(f"journal/{post['slug']}/index.html",
+        head(f"{post['title']} | {BRAND}", post["summary"][:158], f"/journal/{post['slug']}/", ld=ld) + body)
+
+def page_journal():
+    trail = [("Home","/"),("Journal",None)]
+    rows = "".join(
+        f"""<article class="jrow">
+  <p class="label">{e(x["kicker"])} <span class="muted" style="font-style:normal">\u00b7 {e(x["date"])}</span></p>
+  <h2><a href="/journal/{x["slug"]}/">{e(x["title"])}</a></h2>
+  <p>{e(x["summary"])}</p>
+  <p class="rail">{" \u00b7 ".join(e(t) for t in x.get("tags", []))}</p>
+</article>""" for x in JOURNAL)
+    ld = [ld_crumbs(trail),
+          {"@context":"https://schema.org","@type":"Blog","name":f"{BRAND} Journal","url":BASE+"/journal/",
+           "publisher":{"@id":BASE+"/#org"},
+           "blogPost":[{"@type":"BlogPosting","headline":x["title"],"url":f"{BASE}/journal/{x['slug']}/",
+                        "datePublished":x["date"],"description":x["summary"]} for x in JOURNAL]}]
+    body = f"""{header()}
+{crumbs(trail)}
+<main id="main"><div class="wrap narrow">
+  <p class="orient"><b>{len(JOURNAL)}</b> article{"s" if len(JOURNAL)!=1 else ""}<span class="sep">/</span>
+    figures drawn from the index itself<span class="sep">/</span>
+    <a href="/journal/feed.xml">RSS</a></p>
+  <section class="state" style="padding:34px 0 26px">
+    <p class="label">Journal</p>
+    <h1>Written from the index, not around it.</h1>
+    <p>No tips listicles. What gets published here is either derived from data this index actually holds, or an argument about machine-readable commerce that we can back with a test you can run yourself.</p>
+  </section>
+  <div class="rule" style="margin-top:0"><h2>Articles</h2><span class="n">newest first</span>
+    <a class="more" href="/journal/feed.xml">RSS \u2192</a></div>
+  <div class="jlist">{rows}</div>
+</div></main>
+{footer()}"""
+    return write("journal/index.html", head(f"Journal | {BRAND}",
+        "Data drawn from the index, and the argument for machine-readable commerce. No tips listicles.",
+        "/journal/", ld=ld) + body)
 
 # ---------------------------------------------------------------- machine
 def machine_files():
@@ -1196,6 +1522,14 @@ Sitemap: {BASE}/sitemap.xml
 ## Brands carried
 {brand_lines}
 
+## Reference
+- Questions and answers: {BASE}/faq/
+- Journal (data drawn from the index): {BASE}/journal/
+- Journal feed (RSS): {BASE}/journal/feed.xml
+- Editorial standards and what we refuse to publish: {BASE}/journal/how-we-verify-a-store/
+- Contact: {BASE}/contact/
+- Advertising policy: {BASE}/advertise/
+
 ## For brands
 - Why list: {BASE}/for-brands/
 - Pricing, from ${SITE['price_entry']}/mo, no contract: {BASE}/pricing/
@@ -1214,7 +1548,9 @@ listings. Store counts and listing counts in this file are literal.
 Publisher: {SITE['publisher']} ({SITE['publisher_url']}).
 """))
 
-    urls = ["/", "/contents/", "/stores/", "/search/", "/for-brands/", "/pricing/", "/how-it-works/", "/join/", "/about/"]
+    urls = ["/", "/contents/", "/stores/", "/search/", "/for-brands/", "/pricing/",
+            "/how-it-works/", "/join/", "/about/", "/contact/", "/advertise/", "/faq/", "/journal/"]
+    urls += [f"/journal/{x['slug']}/" for x in JOURNAL]
     urls += [f"/c/{c['slug']}/" for c in CATS]
     urls += [f"/t/{k}/" for k in TYPES]
     urls += [f"/b/{k}/" for k in BRANDS]
@@ -1226,6 +1562,34 @@ Publisher: {SITE['publisher']} ({SITE['publisher_url']}).
     out.append(write("sitemap.xml",
         '<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">'
         + body + "</urlset>"))
+
+    out.append(write("site.webmanifest", json.dumps({
+        "name": BRAND, "short_name": SITE["short"],
+        "description": SITE["pitch"], "start_url": "/", "scope": "/",
+        "display": "standalone", "background_color": "#F7F6F1", "theme_color": "#16181C",
+        "icons": [{"src": "/assets/icons/icon-192.png", "sizes": "192x192", "type": "image/png"},
+                  {"src": "/assets/icons/icon-512.png", "sizes": "512x512", "type": "image/png"},
+                  {"src": "/assets/icons/icon.svg", "sizes": "any", "type": "image/svg+xml"}],
+    }, indent=2)))
+
+    def rfc822(d):
+        import datetime as _dt
+        return _dt.datetime.strptime(d, "%Y-%m-%d").strftime("%a, %d %b %Y 00:00:00 +0000")
+    items = "".join(
+        f"<item><title>{html.escape(x['title'])}</title>"
+        f"<link>{BASE}/journal/{x['slug']}/</link>"
+        f"<guid isPermaLink=\"true\">{BASE}/journal/{x['slug']}/</guid>"
+        f"<pubDate>{rfc822(x['date'])}</pubDate>"
+        f"<description>{html.escape(x['summary'])}</description>"
+        + "".join(f"<category>{html.escape(t)}</category>" for t in x.get("tags", []))
+        + "</item>" for x in JOURNAL)
+    out.append(write("journal/feed.xml",
+        '<?xml version="1.0" encoding="UTF-8"?>\n'
+        '<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel>'
+        f"<title>{html.escape(BRAND)} Journal</title><link>{BASE}/journal/</link>"
+        f"<description>{html.escape(SITE['pitch'])}</description><language>en-us</language>"
+        f'<atom:link href="{BASE}/journal/feed.xml" rel="self" type="application/rss+xml"/>'
+        f"{items}</channel></rss>"))
 
     out.append(write("CNAME", SITE["domain"] + "\n"))
     out.append(write(".nojekyll", ""))
@@ -1247,6 +1611,11 @@ def main():
     made.append(page_how())
     made.append(page_join())
     made.append(page_about())
+    made.append(page_contact())
+    made.append(page_advertise())
+    made.append(page_faq())
+    made.append(page_journal())
+    for post in JOURNAL: made.append(page_post(post))
     made.append(page_404())
     made += machine_files()
     print(f"built {len(made)} files")
