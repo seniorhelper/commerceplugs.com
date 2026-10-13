@@ -138,21 +138,35 @@ def head(title, desc, path, extra="", ld=None, og="default", og_alt=None):
 <a class="skip" href="#main">Skip to content</a>
 """
 
-# The mark: a plug. The name is Commerce Plugs and the action we are selling is
-# "plug your store in", so the glyph says it literally rather than abstractly.
-# Two prongs and a chunky body survive 16px; a cord or a socket slot does not.
-def plug_svg(size=30, fill="#F15A22", glyph="#fff", rx=16):
+# The mark is the out-arrow: every link on this site leaves for the seller.
+# Settled in the brand round — orange tile, white arrow, 16px radius.
+def arrow_svg(size=30, fill="#F15A22", glyph="#fff", rx=16):
     return (f'<svg viewBox="0 0 64 64" width="{size}" height="{size}" aria-hidden="true" focusable="false">'
             f'<rect x="2" y="2" width="60" height="60" rx="{rx}" fill="{fill}"/>'
-            f'<path d="M20 13h24a3 3 0 0 1 3 3v12a11 11 0 0 1-11 11H28a11 11 0 0 1-11-11V16a3 3 0 0 1 3-3z" fill="{glyph}"/>'
-            f'<rect x="24" y="41" width="6.5" height="11" rx="3.25" fill="{glyph}"/>'
-            f'<rect x="33.5" y="41" width="6.5" height="11" rx="3.25" fill="{glyph}"/>'
-            '</svg>')
+            f'<path d="M24 40 L40 24" stroke="{glyph}" stroke-width="6" stroke-linecap="round"/>'
+            f'<path d="M27 24 H40 V37" fill="none" stroke="{glyph}" stroke-width="6" '
+            'stroke-linecap="round" stroke-linejoin="round"/></svg>')
 
-MARK = plug_svg()
+# The plug is a CONTENT icon, not the logo. It appears only where the page is
+# literally talking about plugging a store or an app in.
+def plug_svg(size=24, color="currentColor"):
+    return (f'<svg class="glyph" viewBox="0 0 64 64" width="{size}" height="{size}" '
+            'aria-hidden="true" focusable="false">'
+            f'<path d="M23 13h18a3 3 0 0 1 3 3v7a9 9 0 0 1-9 9h-6a9 9 0 0 1-9-9v-7a3 3 0 0 1 3-3z" fill="{color}"/>'
+            f'<rect x="24.2" y="33.5" width="6.2" height="17.5" rx="3.1" fill="{color}"/>'
+            f'<rect x="33.6" y="33.5" width="6.2" height="17.5" rx="3.1" fill="{color}"/></svg>')
+
+# A socket, for the other half of the metaphor: this is what you plug into.
+def socket_svg(size=24, color="currentColor"):
+    return (f'<svg class="glyph" viewBox="0 0 64 64" width="{size}" height="{size}" '
+            'aria-hidden="true" focusable="false">'
+            f'<rect x="8" y="8" width="48" height="48" rx="12" fill="none" stroke="{color}" stroke-width="5"/>'
+            f'<rect x="24" y="22" width="6" height="20" rx="3" fill="{color}"/>'
+            f'<rect x="34" y="22" width="6" height="20" rx="3" fill="{color}"/></svg>')
+
+MARK = arrow_svg()
 
 def wordmark():
-    """The plug, then commerce + plugs with the weight shift and the accent stop."""
     return f'{MARK}<span class="m1">commerce<b>plugs</b><i>.</i></span>'
 
 def header(active=None):
@@ -368,6 +382,14 @@ def page_home():
         seen.add(x.get("subcategory")); spread.append(x)
         if len(spread) == 8: break
     spread_html = "".join(plate(x, i+1) for i, x in enumerate(spread))
+
+    # four real listings, one per type, for the hero. No photo, no tile.
+    art = [x for x in spread if x.get("image")][:4]
+    hero_tiles = "".join(
+        f'<a class="htile" href="{e(x["url"])}" rel="nofollow noopener" target="_blank">'
+        f'<img src="{e(x["image"])}" alt="{e(x["title"])}" loading="eager" decoding="async">'
+        f'<span class="htile-cap"><b>{e(x["subcategory"])}</b>{money_mono(x["price"])}</span></a>'
+        for x in art)
     deep = PRODUCTS[8:20]
 
     types_n, brands_n = len(TYPES), len(BRANDS)
@@ -386,14 +408,28 @@ def page_home():
     compiled <b>{TODAY}</b><span class="sep">/</span>commission taken <b>0%</b>
   </p>
 
-  <section class="state">
-    <h1>Buy it from the people who make it.</h1>
-    <p>{e(BRAND)} is an index of independent online stores. Search it, find the thing, then buy on the seller's own site. We never handle the money, so nothing here is marked up to pay us and no listing is bought.</p>
-    <span class="after">
-      <a href="#goods">See the goods</a>
-      <a href="/contents/">Contents</a>
-      <a href="/for-brands/">List your brand</a>
-    </span>
+  <section class="hero">
+    <div class="hero-copy">
+      <h1>Buy it from the people who make it.</h1>
+      <p>{e(BRAND)} is an index of independent online stores. Search it, find the thing, then buy on the seller's own site. We never handle the money, so nothing here is marked up to pay us and no listing is bought.</p>
+      <span class="after">
+        <a href="#goods">See the goods</a>
+        <a href="/contents/">Browse by type</a>
+      </span>
+      <p class="hero-trust">{socket_svg(20)} <span>Independent sellers only &middot; every link goes to their own checkout &middot; <b>0% commission</b></span></p>
+    </div>
+
+    <aside class="hero-art" aria-label="A sample of what is listed">
+      <div class="hero-grid">{hero_tiles}</div>
+      <a class="hero-cta" href="/join/">
+        {plug_svg(26)}
+        <span>
+          <b>Sell something good?</b>
+          Plug your store in from {money(SITE["price_entry"])} a month &mdash; and keep every cent of the sale.
+        </span>
+        <span class="go" aria-hidden="true">&rarr;</span>
+      </a>
+    </aside>
   </section>
 </div>
 

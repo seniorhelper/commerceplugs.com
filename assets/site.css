@@ -1338,3 +1338,82 @@ a[style*="--brand)"], .sheet-top a { color: var(--brand-ink); }
 /* honeypot: off-screen rather than display:none, because some bots skip
    hidden fields but still fill ones they can "see" in the DOM */
 .hp { position: absolute; left: -9999px; top: auto; width: 1px; height: 1px; overflow: hidden; }
+
+/* ============================================================
+   HERO — copy left, real goods right
+   The single column left half the viewport empty on a laptop,
+   which is the worst place on the site to show nothing. The art
+   is four real listings, so the first thing anyone sees is the
+   actual merchandise rather than an illustration.
+   ============================================================ */
+.hero {
+  display: grid; grid-template-columns: 1.02fr .98fr; gap: 56px;
+  align-items: center; padding: 46px 0 44px; border-bottom: 1px solid var(--line);
+}
+@media (max-width: 1020px) { .hero { grid-template-columns: 1fr; gap: 34px; padding: 34px 0 32px; } }
+.hero-copy h1 { max-width: 15ch; margin-bottom: .8rem; }
+.hero-copy h1 em { font-style: normal; color: var(--brand); }
+.hero-copy > p { font: 400 1.1rem/1.6 var(--sans); color: var(--ink-2); max-width: 52ch; margin: 0 0 1.4rem; }
+.hero .after { display: flex; flex-wrap: wrap; gap: 10px; }
+.hero .after a {
+  font: 500 .95rem var(--sans); border: 1.5px solid var(--line-2);
+  border-radius: var(--radius); color: var(--ink); padding: .62rem 1rem;
+}
+.hero .after a:first-child { background: var(--on-brand); border-color: var(--on-brand); color: #fff; }
+.hero .after a:hover { border-color: var(--brand); color: var(--brand-ink); background: var(--brand-soft); }
+.hero .after a:first-child:hover { background: #9E340A; border-color: #9E340A; color: #fff; }
+.hero-trust {
+  display: flex; align-items: center; gap: .55rem; margin: 1.5rem 0 0;
+  font: 400 .9rem var(--sans); color: var(--muted);
+}
+.hero-trust .glyph { flex: 0 0 auto; color: var(--accent-ink); }
+.hero-trust b { color: var(--ink-2); font-weight: 600; }
+
+.hero-art { display: flex; flex-direction: column; gap: 14px; }
+.hero-grid {
+  display: grid; grid-template-columns: 1fr 1fr; gap: 1px;
+  background: var(--line); border: 1px solid var(--line);
+  border-radius: var(--radius-lg); overflow: hidden;
+}
+.htile { background: #fff; aspect-ratio: 1; display: block; position: relative; overflow: hidden; }
+.htile img { width: 100%; height: 100%; object-fit: contain; padding: 14px; transition: transform .3s ease; }
+.htile:hover img { transform: scale(1.05); }
+.htile-cap {
+  position: absolute; left: 0; right: 0; bottom: 0; display: flex; justify-content: space-between;
+  align-items: baseline; gap: 8px; padding: 9px 11px;
+  background: linear-gradient(to top, rgba(255,255,255,.97) 65%, rgba(255,255,255,0));
+  font: 600 .82rem var(--sans); color: var(--ink); font-variant-numeric: tabular-nums;
+}
+.htile-cap b { font-weight: 500; color: var(--muted); font-size: .78rem; }
+.htile:hover .htile-cap { color: var(--brand-ink); }
+
+.hero-cta {
+  display: flex; align-items: center; gap: 13px; padding: 15px 17px;
+  border: 1.5px solid var(--accent); border-radius: var(--radius-lg);
+  background: var(--accent-soft); color: var(--ink);
+}
+.hero-cta:hover { background: var(--accent); color: #fff; text-decoration: none; border-color: var(--accent); }
+.hero-cta .glyph { flex: 0 0 auto; color: var(--accent-ink); }
+.hero-cta:hover .glyph, .hero-cta:hover b { color: #fff; }
+.hero-cta span { font: 400 .9rem/1.42 var(--sans); }
+.hero-cta b { display: block; font: 600 1rem var(--sans); color: var(--accent-ink); margin-bottom: .12rem; }
+.hero-cta .go { margin-left: auto; font-size: 1.2rem; color: var(--accent-ink); }
+.hero-cta:hover .go { color: #fff; }
+
+/* the plug and socket are content icons: they appear where the page is
+   literally talking about plugging in, never as the mark */
+.glyph { display: inline-block; vertical-align: middle; }
+
+/* the trust line wraps on a laptop; keep the glyph with the first line
+   rather than letting flex centre it against two lines of text */
+.hero-trust { align-items: flex-start; }
+.hero-trust .glyph { margin-top: .05rem; }
+.hero-trust > span { flex: 1; min-width: 0; }
+@media (min-width: 1021px) { .hero-copy { align-self: center; } }
+
+/* product tiles are always white so the photography reads; their captions must
+   pin their colours too, or dark mode flips the text and not the ground */
+.htile { color: #0E0E11; }
+.htile-cap { color: #0E0E11; background: linear-gradient(to top, rgba(255,255,255,.97) 65%, rgba(255,255,255,0)); }
+.htile-cap b { color: #5F5F69; }
+.htile:hover .htile-cap { color: #C2410C; }

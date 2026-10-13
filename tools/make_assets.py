@@ -30,28 +30,20 @@ def center(d, box, text, fnt, fill):
 
 # ---------------------------------------------------------------- mark
 def mark(size, bleed=True):
-    """Orange tile, white plug: a body with square shoulders and a rounded chin,
-    plus two prongs. Proportions matter more than detail — the body has to stay
-    small enough that the prongs still read as prongs at 16px."""
-    s = size * 8                       # supersample, then downscale
+    """Orange tile, white arrow leaving the frame. Stroke weight rises at small
+    sizes or the arrow closes up and reads as a blob."""
+    s = size * 8
     im = Image.new("RGBA", (s, s), (0, 0, 0, 0))
     d = ImageDraw.Draw(im)
     u = s / 64.0
-    def b(*v): return [x * u for x in v]
-
-    d.rounded_rectangle(b(1, 1, 63, 63), radius=int(16 * u), fill=OXBLOOD)
-
-    # body: 24 wide, 19 tall, sitting high so the prongs have room
-    bx0, bx1, by0, by1 = 20.0, 44.0, 13.0, 32.0
-    d.rounded_rectangle(b(bx0, by0, bx1, by1), radius=int(3 * u), fill=PAPER)
-    d.rounded_rectangle(b(bx0, by0 + 7, bx1, by1), radius=int(9 * u), fill=PAPER)
-
-    # prongs: long enough to be unmistakable, thick enough to survive 16px
-    pw = 7.0 if size < 48 else 6.2
-    gap = 8.0
-    for x in (32 - gap / 2 - pw, 32 + gap / 2):
-        d.rounded_rectangle(b(x, 33.5, x + pw, 51), radius=int(pw / 2 * u), fill=PAPER)
-
+    d.rounded_rectangle([u, u, 63 * u, 63 * u], radius=int(16 * u), fill=OXBLOOD)
+    w = max(2, int(s * (0.100 if size >= 48 else 0.118)))
+    def pt(x, y): return (x * u, y * u)
+    d.line([pt(24, 40), pt(40, 24)], fill=PAPER, width=w)
+    d.line([pt(27, 24), pt(40, 24)], fill=PAPER, width=w)
+    d.line([pt(40, 24), pt(40, 37)], fill=PAPER, width=w)
+    for c in (pt(24, 40), pt(40, 24), pt(27, 24), pt(40, 37)):
+        d.ellipse([c[0] - w / 2, c[1] - w / 2, c[0] + w / 2, c[1] + w / 2], fill=PAPER)
     return im.resize((size, size), Image.LANCZOS)
 
 for n in (16, 32, 48, 180, 192, 512):
@@ -64,9 +56,9 @@ ims[0].save(os.path.join(ROOT, "favicon.ico"), sizes=[(16, 16), (32, 32), (48, 4
 open(os.path.join(ICON, "icon.svg"), "w").write(
     '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64">'
     '<rect x="2" y="2" width="60" height="60" rx="16" fill="#F15A22"/>'
-    '<path d="M23 13h18a3 3 0 0 1 3 3v7a9 9 0 0 1-9 9h-6a9 9 0 0 1-9-9v-7a3 3 0 0 1 3-3z" fill="#fff"/>'
-    '<rect x="24.2" y="33.5" width="6.2" height="17.5" rx="3.1" fill="#fff"/>'
-    '<rect x="33.6" y="33.5" width="6.2" height="17.5" rx="3.1" fill="#fff"/></svg>')
+    '<path d="M24 40 L40 24" stroke="#fff" stroke-width="6.5" stroke-linecap="round"/>'
+    '<path d="M27 24 H40 V37" fill="none" stroke="#fff" stroke-width="6.5" '
+    'stroke-linecap="round" stroke-linejoin="round"/></svg>')
 
 # ---------------------------------------------------------------- og cards
 W, H = 1200, 630
