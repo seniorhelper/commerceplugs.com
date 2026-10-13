@@ -224,6 +224,34 @@ def listing_row(p):
   </div>
 </div>"""
 
+def plate(p, n=None):
+    """A product reproduced large on white stock. The shop half of the page."""
+    img = (f'<img src="{e(p["image"])}" alt="{e(p["title"])}" loading="lazy" decoding="async">'
+           if p.get("image") else "")
+    spec = " \u00b7 ".join(x for x in [p.get("brand"), p.get("dimensions") or p.get("finish") or p.get("subcategory")] if x)
+    num = f'<span class="no">{n:02d}</span>' if n else ""
+    return f"""<a class="plate" href="{e(p["url"])}" rel="nofollow noopener" target="_blank">
+  {num}<span class="fig">{img}</span>
+  <span class="cap">
+    <span class="t">{e(p["title"])}</span>
+    <span class="m">{e(spec)}</span>
+    <span class="p">{money_mono(p["price"])}</span>
+  </span>
+</a>"""
+
+def views_switch():
+    return ('<span class="views" role="group" aria-label="View">'
+            '<button type="button" data-view="plates" aria-pressed="true">Plates</button>'
+            '<button type="button" data-view="rows" aria-pressed="false">List</button></span>')
+
+def catalog(items, start_grid=True):
+    """Both views, server-rendered. The switch only toggles hidden."""
+    if not items: return ""
+    return (f'<div class="plates" data-view-pane="plates"{"" if start_grid else " hidden"}>'
+            + "".join(plate(x, i+1) for i, x in enumerate(items)) + "</div>"
+            + f'<div class="rows" data-view-pane="rows"{" hidden" if start_grid else ""}>'
+            + "".join(listing_row(x) for x in items) + "</div>")
+
 def index_entry(name, href, count, unit=""):
     return (f'<a class="ix" href="{href}"><span class="nm">{e(name)}</span>'
             f'<span class="lead"></span><span class="ct">{count}{unit}</span></a>')
@@ -285,11 +313,21 @@ def page_home():
     by_cat = {c["slug"]: len([p for p in PRODUCTS if p.get("category") == c["slug"]]) for c in CATS}
     live   = [c for c in CATS if by_cat[c["slug"]]]
     open_c = [c for c in CATS if not by_cat[c["slug"]]]
-
     ix_live = "".join(index_entry(c["name"], f'/c/{c["slug"]}/', by_cat[c["slug"]]) for c in live)
     ix_open = "".join(index_entry(c["name"], f'/c/{c["slug"]}/', "\u2014") for c in open_c)
     reg = "".join(register_row(i + 1, s) for i, s in enumerate(STORES))
-    recent = "".join(listing_row(p) for p in PRODUCTS[:14])
+
+    # one plate per type, so the opening spread shows the range rather than eight shower doors
+    seen, spread = set(), []
+    for x in PRODUCTS:
+        if x.get("subcategory") in seen: continue
+        seen.add(x.get("subcategory")); spread.append(x)
+        if len(spread) == 8: break
+    spread_html = "".join(plate(x, i+1) for i, x in enumerate(spread))
+    deep = PRODUCTS[8:20]
+
+    types_n, brands_n = len(TYPES), len(BRANDS)
+    prices = sorted(float(x["price"]) for x in PRODUCTS if x.get("price"))
 
     ld = [{"@context":"https://schema.org","@type":"WebSite","name":BRAND,"url":BASE+"/",
            "potentialAction":{"@type":"SearchAction","target":{"@type":"EntryPoint","urlTemplate":BASE+"/search/?q={search_term_string}"},"query-input":"required name=search_term_string"}},
@@ -297,26 +335,31 @@ def page_home():
 
     body = f"""{header()}
 <main id="main"><div class="wrap">
-
   <p class="orient">
     <b>{len(STORES)}</b> store{"s" if len(STORES)!=1 else ""}<span class="sep">/</span>
     <b>{len(PRODUCTS)}</b> listing{"s" if len(PRODUCTS)!=1 else ""}<span class="sep">/</span>
-    <b>{len(live)}</b> of {len(CATS)} categories live<span class="sep">/</span>
-    compiled <b>{TODAY}</b><span class="sep">/</span>
-    commission taken <b>0%</b>
+    <b>{types_n}</b> types<span class="sep">/</span><b>{brands_n}</b> brands<span class="sep">/</span>
+    compiled <b>{TODAY}</b><span class="sep">/</span>commission taken <b>0%</b>
   </p>
 
   <section class="state">
     <h1>Buy it from the people who make it.</h1>
     <p>{e(BRAND)} is an index of independent online stores. Search it, find the thing, then buy on the seller's own site. We never handle the money, so nothing here is marked up to pay us and no listing is bought.</p>
-    <p class="sm muted">Every record is dated. Nothing is estimated. A store with no catalog connected shows no prices rather than invented ones.</p>
     <span class="after">
-      <a href="#index">Browse the index</a>
-      <a href="/stores/">The register</a>
+      <a href="#goods">See the goods</a>
+      <a href="/contents/">Contents</a>
       <a href="/for-brands/">List your brand</a>
     </span>
   </section>
+</div>
 
+<div class="bleed bleed-tint" id="goods"><div class="wrap">
+  <div class="rule" style="margin-top:0"><h2>Plates</h2><span class="n">one from each of the first eight types</span>
+    <a class="more" href="/contents/">All {types_n} types \u2192</a></div>
+  <div class="plates" style="margin-top:14px">{spread_html}</div>
+</div></div>
+
+<div class="wrap">
   <div class="rule" id="index"><h2>Index</h2><span class="n">{len(CATS)} categories</span>
     <a class="more" href="/search/">Search \u2192</a></div>
   <div class="index-list">{ix_live}</div>
@@ -331,19 +374,44 @@ def page_home():
     <thead><tr><th></th><th>Store</th><th>Categories</th><th>Ships to</th><th class="num">Listings</th><th class="num">State</th></tr></thead>
     <tbody>{reg}</tbody>
   </table>
+</div>
 
-  <div class="rule"><h2>Listings</h2><span class="n">{len(PRODUCTS)} published</span>
+<div class="bleed bleed-ink" style="margin-top:44px"><div class="wrap">
+  <div class="grid g2" style="gap:40px;align-items:center">
+    <div>
+      <p class="label" style="color:var(--mast-accent)">For brands</p>
+      <p class="claim">If a machine cannot read your store, it <em>cannot recommend it.</em></p>
+      <p>The crawlers behind AI assistants do not run JavaScript, do not log in and do not guess. They pass along what is written down in plain text, at a fixed address, with a date on it. Most independent stores publish none of that.</p>
+      <p>Building that record is the entire job here, and it costs {money(SITE["price_entry"])} a month with no contract.</p>
+      <span class="after" style="display:flex;gap:0 22px;flex-wrap:wrap;margin-top:1rem">
+        <a href="/for-brands/" style="border-bottom:1px solid">Why this matters</a>
+        <a href="/pricing/" style="border-bottom:1px solid">Pricing</a>
+        <a href="/join/" style="border-bottom:1px solid">Apply to list</a>
+      </span>
+    </div>
+    <div class="figures">
+      <div class="figure" style="background:#1F2228"><span class="v" style="color:#7FC4B4">0%</span><span class="k" style="color:#9A958B">commission taken</span></div>
+      <div class="figure" style="background:#1F2228"><span class="v" style="color:#7FC4B4">{len(PRODUCTS)}</span><span class="k" style="color:#9A958B">listings on the record</span></div>
+      <div class="figure" style="background:#1F2228"><span class="v" style="color:#7FC4B4">{types_n}</span><span class="k" style="color:#9A958B">product types indexed</span></div>
+      <div class="figure" style="background:#1F2228"><span class="v" style="color:#7FC4B4">{money_mono(prices[0]) if prices else "\u2014"}</span><span class="k" style="color:#9A958B">lowest listed price</span></div>
+    </div>
+  </div>
+</div></div>
+
+<div class="wrap">
+  <div class="rule"><h2>Further listings</h2><span class="n">{len(PRODUCTS)} published in all</span>
     <a class="more" href="/search/">Search all \u2192</a></div>
-  <div class="rows">{recent}</div>
+  <div class="rows">{"".join(listing_row(x) for x in deep)}</div>
+</div>
 
-  <section class="ledge">
-    <h2>If a machine cannot read your store, it cannot recommend it.</h2>
-    <p>The crawlers behind AI assistants do not run JavaScript, do not log in and do not guess. They pass along what is written down in plain text, at a fixed address, with a date on it. Most independent stores publish none of that.</p>
-    <p>Building that record is the entire job here, and it costs {money(SITE["price_entry"])} a month with no contract.</p>
-    <span class="after"><a href="/for-brands/">Why this matters</a><a href="/pricing/">Pricing</a><a href="/join/">Apply to list</a></span>
-  </section>
-
-</div></main>
+<div class="bleed bleed-red" style="margin-top:44px"><div class="wrap">
+  <p class="claim" style="margin-bottom:.5rem">Every link here goes to the seller. <em>We never take the transaction.</em></p>
+  <p style="max-width:58ch">No commission, no referral fee, no checkout, no affiliate links inside listings. The customer, the email address, the payment and the margin stay with the brand.</p>
+  <span class="after" style="display:flex;gap:0 22px;flex-wrap:wrap;margin-top:1rem">
+    <a href="/how-it-works/">How it works</a><a href="/about/">About the index</a>
+  </span>
+</div></div>
+</main>
 {footer()}"""
     return write("index.html", head(f"{BRAND} \u2014 {SITE['tagline']}",
         "An index of independent online stores. Search real sellers and buy direct from the brand. No marketplace fees, no middleman checkout, no commission.",
@@ -401,11 +469,8 @@ def page_category(c):
     </div>
     <div>
       <div class="rule" style="margin-top:0"><h2>Listings</h2><span class="n">{len(prods)} in {e(c["name"])}</span>
-        <select id="sort" class="more" aria-label="Sort" style="margin-left:auto">
-          <option value="rel">Order: as indexed</option>
-          <option value="lo">Price: low to high</option>
-          <option value="hi">Price: high to low</option></select></div>
-      <div class="rows" id="results">{rows}</div>
+        {views_switch() if prods else ""}</div>
+      <div id="results">{catalog(prods) if prods else rows}</div>
     </div>
   </div>
 </div></main>
@@ -422,13 +487,19 @@ def page_store(s):
     subs  = sorted({p.get("subcategory") for p in prods if p.get("subcategory")})
     brands = sorted({p.get("brand") for p in prods if p.get("brand")})
     prices = sorted(float(p["price"]) for p in prods if p.get("price"))
+    withimg = [p for p in prods if p.get("image")]
 
-    rows = "".join(listing_row(p) for p in prods) if prods else f"""<div class="slot">
-  <span class="tag">Catalog not connected</span>
-  <h3>No product listings published yet</h3>
-  <p>{e(s["name"])} has a listing on the index but has not connected a product feed, so we publish no prices or stock for it. Nothing here is estimated. Browse the catalog at the store itself.</p>
-  <a class="btn btn-sm btn-brand" href="{e(s["url"])}" rel="nofollow noopener" target="_blank" style="align-self:flex-start">Open {e(s["name"])}</a>
-</div>"""
+    # one plate per type for the showcase, so the spread shows the range
+    seen, showcase = set(), []
+    for x in withimg:
+        if x.get("subcategory") in seen: continue
+        seen.add(x.get("subcategory")); showcase.append(x)
+        if len(showcase) == 8: break
+
+    mosaic = "".join(
+        f'<a href="{e(x["url"])}" rel="nofollow noopener" target="_blank" title="{e(x["title"])}">'
+        f'<img src="{e(x["image"])}" alt="{e(x["title"])}" loading="lazy" decoding="async"></a>'
+        for x in withimg[:5])
 
     pol = s.get("policy_urls") or {}
     facts = [
@@ -437,12 +508,12 @@ def page_store(s):
         ("Ships from", e(s.get("ships_from") or "Not verified")),
         ("Ships to", e(", ".join(s.get("ships_to", [])) or "Not verified")),
         ("Currency", e(s.get("currency") or "Not verified")),
-        ("Categories", e(cats)),
-        ("Types carried", e(", ".join(subs)) if subs else "Not verified"),
-        ("Brands carried", e(", ".join(brands)) if brands else "Not verified"),
+        ("Categories", " \u00b7 ".join(f'<a href="/c/{c}/">{e(CATBY[c]["name"])}</a>' for c in s.get("categories", []) if c in CATBY)),
+        ("Types carried", " \u00b7 ".join(f'<a href="/t/{slug(x)}/">{e(x)}</a>' for x in subs) or "Not verified"),
+        ("Brands carried", " \u00b7 ".join(f'<a href="/b/{slug(x)}/">{e(x)}</a>' for x in brands) or "Not verified"),
         ("Price range", f"{money_mono(prices[0])} to {money_mono(prices[-1])}" if prices else "No prices published"),
-        ("Listings published", str(len(prods))),
         ("Returns", e(s.get("returns") or "Not verified") + (f' <a href="{e(pol["returns"])}" rel="nofollow noopener" target="_blank">Policy \u2192</a>' if pol.get("returns") else "")),
+        ("Shipping policy", f'<a href="{e(pol["shipping"])}" rel="nofollow noopener" target="_blank">Read the store\u2019s shipping terms \u2192</a>' if pol.get("shipping") else "Not verified"),
         ("Record verified", e(s.get("verified") or "Pending")),
     ]
     spec = "".join(f"<div><dt>{k}</dt><dd>{v}</dd></div>" for k, v in facts)
@@ -451,7 +522,14 @@ def page_store(s):
 
     about = e(s["summary"]) if s.get("summary") else (
         f'{e(s["name"])} is an independent online store indexed under {e(cats) or "the index"}. '
-        f'Fields we have not confirmed with the store read <em>not verified</em>, because we would rather show a blank than a guess.')
+        f'Fields we have not confirmed with the store read <em>not verified</em>.')
+
+    empty = f"""<div class="slot">
+  <span class="tag">Catalog not connected</span>
+  <h3>No product listings published yet</h3>
+  <p>{e(s["name"])} has a listing on the index but has not connected a product feed, so we publish no prices or stock for it. Nothing here is estimated.</p>
+  <a class="btn btn-sm btn-brand" href="{e(s["url"])}" rel="nofollow noopener" target="_blank" style="align-self:flex-start">Open {e(s["name"])}</a>
+</div>"""
 
     ld = [ld_crumbs(trail),
           {k: v for k, v in {
@@ -463,39 +541,58 @@ def page_store(s):
              "areaServed":s.get("ships_to") or None,
              "makesOffer":[{"@type":"Offer","name":p["title"],"price":p["price"],"priceCurrency":p.get("currency","USD"),
                             "availability":"https://schema.org/InStock" if p.get("availability")=="in_stock" else "https://schema.org/OutOfStock",
-                            "sku":p.get("sku"),"url":p["url"]} for p in prods] or None,
+                            "sku":p.get("sku"),"url":p["url"],"image":p.get("image")} for p in prods] or None,
            }.items() if v is not None}]
 
     body = f"""{header()}
 {crumbs(trail)}
 <main id="main"><div class="wrap">
   <p class="orient"><b>{len(prods)}</b> listing{"s" if len(prods)!=1 else ""}<span class="sep">/</span>
+    <b>{len(subs)}</b> types<span class="sep">/</span><b>{len(brands)}</b> brands<span class="sep">/</span>
     {("<b>verified</b> " + e(s["verified"])) if s.get("verified") else "<b>pending verification</b>"}<span class="sep">/</span>
-    catalog <b>{"connected" if s.get("catalog_status")=="connected" else "not connected"}</b><span class="sep">/</span>
     commission taken <b>0%</b></p>
 
-  <section class="state" style="padding:30px 0 26px">
-    <h1>{e(s["name"])}</h1>
-    <p>{about}</p>
-    <span class="after">
-      <a href="{e(s["url"])}" rel="nofollow noopener" target="_blank">Visit {e(host(s["url"]))} \u2192</a>
-      <a href="/join/">Claim this page</a>
-    </span>
-  </section>
+  <div class="sheet-top">
+    <div>
+      <p class="label">Independent store</p>
+      <h1 style="font-size:clamp(2.2rem,5vw,3.6rem);margin-bottom:.6rem">{e(s["name"])}</h1>
+      <p style="font-size:1.1rem;line-height:1.6;color:var(--ink-2)">{about}</p>
+      <span class="after" style="display:flex;gap:0 22px;flex-wrap:wrap;margin-top:1.1rem">
+        <a href="{e(s["url"])}" rel="nofollow noopener" target="_blank" style="font:400 1.05rem var(--display);border-bottom:1px solid var(--brand);color:var(--brand)">Visit {e(host(s["url"]))} \u2192</a>
+        <a href="/join/" style="font:400 1.05rem var(--display);border-bottom:1px solid var(--line-2);color:var(--ink-2)">Claim this page</a>
+      </span>
+    </div>
+    {f'<div class="mosaic">{mosaic}</div>' if mosaic else ""}
+  </div>
   {note}
+</div>
+
+<div class="bleed bleed-green"><div class="wrap">
+  <div class="figures">
+    <div class="figure"><span class="v">{len(prods)}</span><span class="k">listings published</span></div>
+    <div class="figure"><span class="v">{len(subs)}</span><span class="k">product types</span></div>
+    <div class="figure"><span class="v">{money_mono(prices[0]) if prices else "\u2014"}</span><span class="k">from</span></div>
+    <div class="figure"><span class="v">{money_mono(prices[-1]) if prices else "\u2014"}</span><span class="k">to</span></div>
+  </div>
+</div></div>
+
+<div class="wrap">
+  {f'<div class="rule"><h2>Selected plates</h2><span class="n">one from each of {len(showcase)} types</span><a class="more" href="#catalog">Full catalog \u2192</a></div><div class="plates" style="margin-top:14px">{"".join(plate(x, i+1) for i, x in enumerate(showcase))}</div>' if showcase else ""}
 
   <div class="rule"><h2>Record</h2><span class="n">what we publish, and what we have not confirmed</span>
     <a class="more" href="/feeds/stores.json">Feed \u2192</a></div>
   <dl class="spec">{spec}</dl>
 
-  <div class="rule"><h2>Listings</h2><span class="n">{len(prods)} published</span></div>
-  <div class="rows">{rows}</div>
-  <p class="sm muted" style="margin-top:14px">Every link goes straight to {e(s["name"])}. {BRAND} takes no commission, handles no payment and sells no placement. Prices and stock are read from the store's own public catalog and dated; check the store for the live figure before you buy.</p>
+  <div class="rule" id="catalog"><h2>Catalog</h2><span class="n">{len(prods)} listing{"s" if len(prods)!=1 else ""}</span>
+    {views_switch() if prods else ""}</div>
+  {catalog(prods) if prods else empty}
+
+  <p class="sm muted" style="margin-top:16px">Every link goes straight to {e(s["name"])}. {BRAND} takes no commission, handles no payment and sells no placement. Prices, stock and specifications are read from the store's own public catalog and dated {e(s.get("verified") or TODAY)}; check the store for the live figure before you buy.</p>
 </div></main>
 {footer()}"""
     return write(f"stores/{s['slug']}/index.html",
         head(f"{s['name']} \u2014 independent store | {BRAND}",
-             (s.get("summary") or f"{s['name']} is an independent online store at {host(s['url'])}, indexed under {cats or 'the index'}.")[:158],
+             (s.get("summary") or f"{s['name']} is an independent online store at {host(s['url'])}.")[:158],
              f"/stores/{s['slug']}/", ld=ld) + body)
 
 def page_stores():
@@ -859,7 +956,6 @@ def page_facet(kind, key, rec):
     stores = sorted({STOREBY.get(i["store"],{}).get("name", i["store"]) for i in items})
     cross  = sorted({(i.get("brand") if kind=="t" else i.get("subcategory")) for i in items if (i.get("brand") if kind=="t" else i.get("subcategory"))})
     cats   = sorted({CATBY[i["category"]]["name"] for i in items if i.get("category") in CATBY})
-    rows   = "".join(listing_row(i) for i in items)
 
     CUR = ' aria-current="page"'
     nav = "".join(
@@ -910,11 +1006,8 @@ def page_facet(kind, key, rec):
     </div>
     <div>
       <div class="rule" style="margin-top:0"><h2>Listings</h2><span class="n">{len(items)} under {e(name)}</span>
-        <select id="sort" class="more" aria-label="Sort" style="margin-left:auto">
-          <option value="rel">Order: as indexed</option>
-          <option value="lo">Price: low to high</option>
-          <option value="hi">Price: high to low</option></select></div>
-      <div class="rows" id="results">{rows}</div>
+        {views_switch()}</div>
+      <div id="results">{catalog(items)}</div>
     </div>
   </div>
 </div></main>

@@ -22,7 +22,9 @@
   --brand: #8C1D18;
   --brand-ink: #6B1310;
   --brand-soft: #F3E4E2;
-  --signal: #2F5D3A;
+  --signal: #1D4D43;
+  --ink2: #1D4D43;        /* the second plate */
+  --ink2-soft: #E4EBE8;
   --signal-soft: #E6EDE6;
   --flag: #8C1D18;
   --flag-soft: #F3E4E2;
@@ -65,6 +67,8 @@
     --brand-ink: #EFA096;
     --brand-soft: #32201E;
     --signal: #7FB68C;
+    --ink2: #7FC4B4;
+    --ink2-soft: #16261F;
     --signal-soft: #1C2A1F;
     --flag: #E0796F;
     --flag-soft: #32201E;
@@ -885,3 +889,94 @@ img, svg { max-width: 100%; height: auto; }
 .top-act .cta:hover { background: #6B1310; border-color: #6B1310; color: var(--mast-ink); }
 .find button { background: var(--mast-brand); border-color: var(--mast-brand); color: var(--mast-ink); }
 .find button:hover { background: #6B1310; border-color: #6B1310; }
+
+/* ============================================================
+   PLATES, BANDS AND DEPTH
+   The first pass was all text at one density — correct for a
+   reference work, wrong for a shop. Catalogues sell with
+   plates: goods reproduced large on white stock, against the
+   newsprint page. Depth comes from figure/ground and full-bleed
+   bands rather than shadow, because printed matter has none.
+   ============================================================ */
+
+/* --- a plate: the goods, reproduced large --- */
+.plates { display: grid; grid-template-columns: repeat(4, 1fr); gap: 1px; background: var(--line); border: 1px solid var(--line); }
+@media (max-width: 1000px) { .plates { grid-template-columns: repeat(3, 1fr); } }
+@media (max-width: 720px)  { .plates { grid-template-columns: repeat(2, 1fr); } }
+.plates.p3 { grid-template-columns: repeat(3, 1fr); }
+@media (max-width: 720px) { .plates.p3 { grid-template-columns: repeat(2, 1fr); } }
+
+.plate { background: var(--paper-2); padding: 0; display: flex; flex-direction: column; position: relative; }
+.plate .fig {
+  aspect-ratio: 4 / 3; background: #fff; display: grid; place-items: center;
+  overflow: hidden; border-bottom: 1px solid var(--line);
+}
+.plate .fig img { width: 100%; height: 100%; object-fit: contain; padding: 10px; transition: transform .25s ease; }
+.plate:hover .fig img { transform: scale(1.045); }
+.plate .cap { padding: 11px 13px 13px; display: flex; flex-direction: column; gap: 3px; flex: 1; }
+.plate .cap .t { font: 600 .98rem/1.28 var(--display); letter-spacing: -.01em; color: var(--ink); }
+.plate:hover .cap .t { color: var(--brand); }
+.plate .cap .m { font: 400 .76rem var(--sans); color: var(--muted); }
+.plate .cap .p {
+  font: 600 1.02rem var(--display); font-variant-numeric: lining-nums tabular-nums;
+  color: var(--ink); margin-top: auto; padding-top: 6px;
+}
+.plate .no {
+  position: absolute; top: 0; left: 0; z-index: 2;
+  font: 400 .72rem var(--sans); font-variant-numeric: lining-nums tabular-nums;
+  background: var(--ink); color: var(--paper); padding: .15rem .4rem;
+}
+
+/* --- full-bleed bands: break the column, change the ground --- */
+.bleed { width: 100vw; margin-left: calc(50% - 50vw); }
+.bleed-ink   { background: var(--mast); color: var(--mast-ink); padding: 44px 0; }
+.bleed-ink h2, .bleed-ink h3 { color: var(--mast-ink); }
+.bleed-ink p { color: var(--mast-ink-2); }
+.bleed-ink a { color: var(--mast-accent); border-bottom-color: var(--mast-accent) !important; }
+.bleed-red   { background: var(--mast-brand); color: #F7F6F1; padding: 40px 0; }  /* fixed plate: must not invert */
+.bleed-red h2, .bleed-red h3 { color: #F7F6F1; }
+.bleed-red p { color: #F0DCDA; }
+.bleed-red a { color: #fff; border-bottom: 1px solid #fff; }
+.bleed-red a:hover { background: #fff; color: var(--mast-brand); }
+.bleed-tint  { background: var(--surface); padding: 38px 0; border-top: 1px solid var(--line); border-bottom: 1px solid var(--line); }
+.bleed-green { background: var(--ink2-soft); padding: 38px 0; border-top: 1px solid var(--ink2); border-bottom: 1px solid var(--ink2); }
+
+/* --- mosaic: fills the dead column beside a brand's description --- */
+.mosaic { display: grid; grid-template-columns: 1fr 1fr; gap: 1px; background: var(--line); border: 1px solid var(--line); align-self: start; }
+.mosaic a { aspect-ratio: 1; background: #fff; display: grid; place-items: center; overflow: hidden; }
+.mosaic img { width: 100%; height: 100%; object-fit: contain; padding: 9px; transition: transform .25s ease; }
+.mosaic a:hover img { transform: scale(1.05); }
+.mosaic a:first-child { grid-column: span 2; aspect-ratio: 2 / 1.08; }
+
+/* --- the brand sheet head: description left, goods right --- */
+.sheet-top { display: grid; grid-template-columns: 1.15fr .85fr; gap: 42px; align-items: start; padding: 34px 0 30px; }
+@media (max-width: 900px) { .sheet-top { grid-template-columns: 1fr; gap: 26px; } }
+
+/* --- figures row: key numbers, set large, on the second plate --- */
+.figures { display: grid; grid-template-columns: repeat(4, 1fr); gap: 1px; background: var(--line); border: 1px solid var(--line); }
+@media (max-width: 760px) { .figures { grid-template-columns: repeat(2, 1fr); } }
+.figure { background: var(--paper); padding: 17px 18px; }
+.figure .v {
+  display: block; font: 600 1.75rem/1 var(--display); letter-spacing: -.025em;
+  font-variant-numeric: lining-nums tabular-nums; color: var(--ink2);
+}
+.figure .k { display: block; font: italic 400 .92rem var(--display); color: var(--muted); margin-top: .3rem; }
+
+/* --- view switch: grid of plates, or the price list --- */
+.views { display: inline-flex; border: 1px solid var(--line-2); margin-left: auto; }
+.views button {
+  font: 400 .9rem var(--display); background: var(--paper); color: var(--ink-2);
+  border: 0; padding: .3rem .7rem; cursor: pointer;
+}
+.views button + button { border-left: 1px solid var(--line-2); }
+.views button[aria-pressed="true"] { background: var(--ink); color: var(--paper); }
+[hidden] { display: none !important; }
+
+/* --- a pull quote / standing claim, set large --- */
+.claim {
+  font: 400 clamp(1.3rem, 2.6vw, 1.95rem)/1.3 var(--display);
+  letter-spacing: -.015em; max-width: 30ch; margin: 0 0 .8rem;
+}
+.claim em { font-style: italic; color: var(--brand); }
+.bleed-ink .claim em { color: var(--mast-accent); }
+.bleed-red .claim em { color: #fff; font-style: italic; }

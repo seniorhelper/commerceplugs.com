@@ -30,6 +30,16 @@
       .catch(function () { cache = null; return null; });
   }
 
+  function plate(it) {
+    var img = it.img ? '<img src="' + esc(it.img) + '" alt="' + esc(it.t) + '" loading="lazy" decoding="async">' : "";
+    var spec = [it.b, it.d || it.f || it.sub].filter(Boolean).map(esc).join(" \u00b7 ");
+    return '<a class="plate" href="' + esc(it.u) + '" rel="nofollow noopener" target="_blank">' +
+      '<span class="fig">' + img + "</span><span class=\"cap\">" +
+      '<span class="t">' + esc(it.t) + "</span>" +
+      '<span class="m">' + spec + "</span>" +
+      '<span class="p">' + money(it.p) + "</span></span></a>";
+  }
+
   function card(it) {
     var img = it.img
       ? '<img src="' + esc(it.img) + '" alt="" loading="lazy" decoding="async">'
@@ -120,7 +130,13 @@
           count.textContent = hits.length + " result" + (hits.length === 1 ? "" : "s") +
             (q ? ' for "' + q + '"' : "");
         }
-        box.innerHTML = hits.map(card).join("");
+        var mode = (function () { try { return localStorage.getItem("cp-view") || "plates"; } catch (e) { return "plates"; } })();
+        box.innerHTML =
+          '<div class="plates" data-view-pane="plates"' + (mode === "plates" ? "" : " hidden") + '>' +
+            hits.map(plate).join("") + "</div>" +
+          '<div class="rows" data-view-pane="rows"' + (mode === "rows" ? "" : " hidden") + '>' +
+            hits.map(card).join("") + "</div>";
+        wireViews();
         if (empty) empty.hidden = hits.length > 0;
       });
     }
@@ -178,7 +194,27 @@
     }
   }
 
+  function wireViews() {
+    var saved = null;
+    try { saved = localStorage.getItem("cp-view"); } catch (e) {}
+    $$(".views").forEach(function (group) {
+      var btns = $$("button", group);
+      function apply(mode) {
+        btns.forEach(function (b) { b.setAttribute("aria-pressed", String(b.dataset.view === mode)); });
+        $$("[data-view-pane]").forEach(function (pane) { pane.hidden = pane.dataset.viewPane !== mode; });
+        try { localStorage.setItem("cp-view", mode); } catch (e) {}
+      }
+      if (saved && (saved === "plates" || saved === "rows")) apply(saved);
+      btns.forEach(function (b) {
+        if (b.dataset.wired) return;
+        b.dataset.wired = "1";
+        b.addEventListener("click", function () { apply(b.dataset.view); });
+      });
+    });
+  }
+
   function init() {
+    wireViews();
     if (!initSearch()) initCategory();
   }
 
