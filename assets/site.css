@@ -1,52 +1,60 @@
 /* Commerce Plugs — design system
-   A printed trade directory, not a software landing page.
-   Newsprint stock, ink black, oxblood red for emphasis the way a printed
-   index uses it. Editorial serif for voice, grotesque for data. Scotch rules
-   (thick over thin) as the dividing device. No monospace anywhere: machine
-   fonts are what every other index-of-things site reaches for, and they make
-   a directory read like a terminal instead of a reference work. */
+   Violet is the accent and it stays rare: the icon, primary buttons, links and
+   the accent full stop. Nothing else. The moment it spreads to headings,
+   borders and backgrounds it becomes the generic look every AI-built site has,
+   which is the thing we are avoiding. Everything else is near-black on white,
+   and the product photography gets to be the colour on the page.
+
+   Bricolage Grotesque for display, Outfit for everything else. Square-ish
+   geometry, 10px radius, no shadows beyond a hairline. */
 
 :root {
-  /* stock and ink */
-  --ink: #16181C;          /* ink black, very slightly cool */
-  --ink-2: #44494F;
-  --muted: #5E646C;
-  --paper: #F7F6F1;        /* newsprint stock, not white, not cream */
-  --paper-2: #FFFFFF;      /* true white, used only where goods are shown */
-  --surface: #EDEBE4;
-  --surface-2: #E2DFD6;
-  --line: #CFCBC0;
-  --line-2: #948E83;
+  /* neutrals */
+  --ink: #0E0E11;
+  --ink-2: #41414A;
+  --muted: #5F5F69;
+  --paper: #FFFFFF;
+  --paper-2: #FFFFFF;
+  --surface: #F4F4F6;
+  --surface-2: #EAEAEE;
+  --line: #E3E3E7;
+  --line-2: #C9C9D0;
 
-  /* emphasis: oxblood, as a printed index uses red */
-  --brand: #8C1D18;
-  --brand-ink: #6B1310;
-  --brand-soft: #F3E4E2;
-  --signal: #1D4D43;
-  --ink2: #1D4D43;        /* the second plate */
-  --ink2-soft: #E4EBE8;
-  --signal-soft: #E6EDE6;
-  --flag: #8C1D18;
-  --flag-soft: #F3E4E2;
+  /* Orange is the primary: the plug, the buttons, the one thing you act on.
+     Violet is the secondary: figures, counts, verified state. They never touch
+     in the same element, so each keeps a meaning.
+     Bright shades are for fills and large graphics; the deep shades are what
+     white text and small links sit on, because the bright ones do not pass. */
+  --brand: #F15A22;
+  --brand-ink: #C2410C;
+  --brand-soft: #FFF0E9;
+  --accent: #6E3BFF;
+  --accent-ink: #5A21D6;
+  --accent-soft: #F1ECFF;
+  --signal: #0E9C8F;
+  --signal-soft: #E3F5F2;
+  --ink2: #6E3BFF;
+  --ink2-soft: #F1ECFF;
+  --flag: #D93A1F;
+  --flag-soft: #FDEBE7;
 
   /* form */
-  --radius: 0;             /* printed matter has no rounded corners */
-  --radius-lg: 0;
+  --radius: 10px;
+  --radius-lg: 14px;
   --hard: none;
   --hard-brand: none;
   --rail: 1px solid var(--line);
 
-  --display: Newsreader, "Times New Roman", Times, serif;
-  --sans: Archivo, "Helvetica Neue", Helvetica, Arial, sans-serif;
-  --mono: Archivo, "Helvetica Neue", Helvetica, Arial, sans-serif;
+  --display: "Bricolage Grotesque", "Outfit", system-ui, sans-serif;
+  --sans: Outfit, system-ui, -apple-system, "Segoe UI", sans-serif;
+  --mono: Outfit, system-ui, sans-serif;
 
-  /* The masthead and colophon are printed in ink on stock in both schemes.
-     They must not invert, or the plate flips and the hardcoded whites break. */
-  --mast: #16181C;
-  --mast-ink: #F7F6F1;
-  --mast-ink-2: #C9C4B9;
-  --mast-accent: #E8A9A2;
-  --mast-brand: #8C1D18;   /* the plate accent, fixed like the rest of the masthead */
+  /* the masthead is light now, so it follows the page rather than inverting */
+  --mast: #FFFFFF;
+  --mast-ink: #0E0E11;
+  --mast-ink-2: #5F5F69;
+  --mast-accent: #F15A22;
+  --mast-brand: #F15A22;
 
   --maxw: 1280px;
   --gut: 22px;
@@ -54,24 +62,32 @@
 
 @media (prefers-color-scheme: dark) {
   :root:not([data-theme="light"]) {
-    --ink: #EDEAE2;
-    --ink-2: #B9B4A9;
-    --muted: #8A857B;
-    --paper: #141414;
-    --paper-2: #1C1C1B;
-    --surface: #1E1E1C;
-    --surface-2: #2A2A27;
-    --line: #35352F;
-    --line-2: #4A4A43;
-    --brand: #E0796F;
-    --brand-ink: #EFA096;
-    --brand-soft: #32201E;
-    --signal: #7FB68C;
-    --ink2: #7FC4B4;
-    --ink2-soft: #16261F;
-    --signal-soft: #1C2A1F;
-    --flag: #E0796F;
-    --flag-soft: #32201E;
+    --ink: #F3F3F6;
+    --ink-2: #B4B4BF;
+    --muted: #8E8E9A;
+    --paper: #0E0E11;
+    --paper-2: #16161A;
+    --surface: #17171C;
+    --surface-2: #202027;
+    --line: #2B2B33;
+    --line-2: #3C3C46;
+    --brand: #FF7A45;
+    --brand-ink: #FF9468;
+    --brand-soft: #2A1710;
+    --accent: #9B6CFF;
+    --accent-ink: #B494FF;
+    --accent-soft: #1C1630;
+    --signal: #2ED3BE;
+    --signal-soft: #0F2A27;
+    --ink2: #9B6CFF;
+    --ink2-soft: #1C1630;
+    --flag: #FF7A61;
+    --flag-soft: #2E1712;
+    --mast: #0E0E11;
+    --mast-ink: #F3F3F6;
+    --mast-ink-2: #8E8E9A;
+    --mast-accent: #FF7A45;
+    --mast-brand: #F15A22;
   }
 }
 :root[data-theme="dark"] {
@@ -90,8 +106,8 @@ body {
   margin: 0;
   background: var(--paper);
   color: var(--ink);
-  font: 400 16.5px/1.6 var(--display);
-  font-variant-numeric: oldstyle-nums;
+  font: 400 16.5px/1.6 var(--sans);
+  font-variant-numeric: normal;
   -webkit-font-smoothing: antialiased;
 }
 img, svg { max-width: 100%; display: block; }
@@ -103,19 +119,19 @@ hr { border: 0; border-top: var(--rail); margin: 28px 0; }
 h1, h2, h3, h4 {
   overflow-wrap: break-word;
   font-family: var(--display);
-  font-weight: 600;
-  letter-spacing: -.012em;     /* a serif does not want the tight tracking a grotesque does */
-  line-height: 1.1;
+  font-weight: 700;
+  letter-spacing: -.032em;
+  line-height: 1.06;
   margin: 0 0 .5rem;
 }
-h1 { font-size: clamp(2rem, 5.4vw, 3.6rem); line-height: 1.02; }
-h2 { font-size: clamp(1.45rem, 3vw, 2rem); }
-h3 { font-size: 1.14rem; }
+h1 { font-size: clamp(2.1rem, 5.6vw, 3.7rem); line-height: 1.01; }
+h2 { font-size: clamp(1.5rem, 3vw, 2.1rem); }
+h3 { font-size: 1.16rem; letter-spacing: -.02em; }
 
 /* the printer's small-cap label, replacing uppercase mono tracking */
 .label, .eyebrow, .kick {
-  font-family: var(--display); font-style: italic; font-weight: 400;
-  font-size: .95rem; letter-spacing: 0; text-transform: none; color: var(--brand);
+  font-family: var(--sans); font-style: normal; font-weight: 600;
+  font-size: .78rem; letter-spacing: .09em; text-transform: uppercase; color: var(--brand-ink);
 }
 
 /* Scotch rule: thick over thin, the dividing device of printed directories */
@@ -1000,3 +1016,321 @@ img, svg { max-width: 100%; height: auto; }
 .post li { margin-bottom: .5rem; font-size: 1.04rem; line-height: 1.6; }
 .post hr { border: 0; border-top: 1px solid var(--line); margin: 22px 0 24px; }
 .post .figures, .post .register, .post .index-list { max-width: none; }
+
+/* ============================================================
+   VIOLET DRESS
+   Replaces the printed-matter overrides above. Geometric sans
+   throughout, 10px radius, a light masthead, and violet held to
+   the icon, primary buttons, links and the accent full stop.
+   ============================================================ */
+
+/* --- masthead: light. Nothing dark at the top of the page. --- */
+.top { background: var(--mast); color: var(--mast-ink); border-bottom: 1px solid var(--line); }
+.top a, .top-act a { color: var(--mast-ink); }
+.top-in { padding: 13px var(--gut); gap: 18px; }
+.mark { gap: .6rem; align-items: center; }
+.mark .m1 { font: 400 1.32rem var(--sans); letter-spacing: -.035em; color: var(--mast-ink); }
+.mark .m1 b { font-weight: 800; }
+.mark .m1 i { font-style: normal; color: var(--brand); }
+.mark .m2 { display: none; }
+.mark svg { flex: 0 0 auto; }
+.top-act a { font: 500 .88rem var(--sans); border-radius: var(--radius); padding: .5rem .72rem; }
+.top-act a:hover { background: var(--surface); text-decoration: none; }
+.top-act .cta, .top-act .cta:hover { color: #fff; }
+.top-act .cta { background: var(--brand); border-color: var(--brand); }
+.top-act .cta:hover { background: var(--brand-ink); border-color: var(--brand-ink); }
+
+.find { gap: 0; }
+.find select, .find input, .find button { border-radius: 0; min-height: 44px; }
+.find select {
+  font: 500 .84rem var(--sans); text-transform: none; letter-spacing: 0;
+  background: var(--surface); color: var(--ink); border: 1.5px solid var(--line-2); border-right: 0;
+  border-radius: var(--radius) 0 0 var(--radius); padding: 0 .6rem; max-width: 170px;
+}
+.find input {
+  border: 1.5px solid var(--line-2); border-left: 0; border-right: 0;
+  font: 400 .97rem var(--sans); background: var(--paper); color: var(--ink);
+}
+.find input::placeholder { color: var(--muted); }
+.find button {
+  background: var(--brand); border: 1.5px solid var(--brand); color: #fff;
+  border-radius: 0 var(--radius) var(--radius) 0; font: 600 .9rem var(--sans); padding: 0 1.15rem;
+}
+.find button:hover { background: var(--brand-ink); border-color: var(--brand-ink); }
+
+/* --- category strip --- */
+.strip { background: var(--paper); border-bottom: 1px solid var(--line); border-top: 0; }
+.strip a {
+  font: 500 .9rem var(--sans); color: var(--ink-2); padding: .62rem .8rem;
+  border-bottom: 2px solid transparent; border-radius: 0;
+}
+.strip a:hover, .strip a[aria-current] { color: var(--brand-ink); border-bottom-color: var(--brand); background: none; }
+
+.crumb { font: 400 .86rem var(--sans); font-style: normal; }
+
+/* --- the standing line --- */
+.orient {
+  font: 400 .92rem/1.5 var(--sans); font-style: normal; letter-spacing: 0;
+  color: var(--muted); border-bottom: 1px solid var(--line); box-shadow: none;
+  padding: 13px 0; gap: 0 8px;
+}
+.orient b { font-weight: 600; color: var(--ink); }
+.orient .sep { color: var(--line-2); }
+
+/* --- statement --- */
+.state { padding: 44px 0 36px; border-bottom: 1px solid var(--line); }
+.state h1 { max-width: 16ch; }
+.state h1 em { font-style: normal; color: var(--brand); }
+.state p { font: 400 1.1rem/1.6 var(--sans); max-width: 58ch; color: var(--ink-2); }
+.state .after { gap: 0 10px; }
+.state .after a {
+  font: 500 .92rem var(--sans); border: 1.5px solid var(--line-2); border-radius: var(--radius);
+  color: var(--ink); padding: .55rem .9rem;
+}
+.state .after a:first-child { background: var(--brand); border-color: var(--brand); color: #fff; }
+.state .after a:hover { border-color: var(--brand); color: var(--brand-ink); background: var(--brand-soft); }
+.state .after a:first-child:hover { background: var(--brand-ink); border-color: var(--brand-ink); color: #fff; }
+
+/* --- section rules --- */
+.rule { border-bottom: 1px solid var(--line); box-shadow: none; padding-bottom: 9px; margin: 40px 0 0; }
+.rule h2 { font: 700 1.3rem var(--display); letter-spacing: -.03em; }
+.rule .n { font: 400 .9rem var(--sans); font-style: normal; color: var(--muted); }
+.rule .more { font: 500 .88rem var(--sans); color: var(--brand-ink); border-bottom: 0; }
+.rule .more:hover { text-decoration: underline; }
+.rule select.more {
+  border: 1.5px solid var(--line-2); border-radius: var(--radius); background: var(--paper);
+  padding: .34rem .55rem; color: var(--ink); font: 500 .86rem var(--sans);
+}
+
+/* --- index: keep the dot leaders, lose the serif --- */
+.index-list { column-rule: 1px solid var(--line); }
+.ix { font: 400 .98rem var(--sans); padding: .46rem 0; border-bottom: 1px solid var(--line); }
+.ix .lead { border-bottom: 1px dotted var(--line-2); }
+.ix .ct { font: 600 .88rem var(--sans); font-variant-numeric: tabular-nums; color: var(--muted); }
+.ix:hover, .ix:hover .ct { color: var(--brand-ink); }
+
+/* --- register --- */
+.register { font-family: var(--sans); }
+.register th { font: 500 .8rem var(--sans); font-style: normal; color: var(--muted); border-bottom: 1px solid var(--line); }
+.register .ix-n { font: 600 .85rem var(--sans); color: var(--brand); font-variant-numeric: tabular-nums; }
+.register .nm a { font: 700 1.05rem var(--display); letter-spacing: -.025em; }
+.register .nm a:hover { color: var(--brand-ink); }
+.register .dom { font: 400 .84rem var(--sans); font-style: normal; color: var(--muted); }
+
+/* --- listing rows --- */
+.rows { border-top: 1px solid var(--line); box-shadow: none; }
+.row:hover { background: var(--surface); }
+.row .th { border: 1px solid var(--line); border-radius: var(--radius); }
+.row .ttl { font: 600 1.02rem/1.32 var(--sans); letter-spacing: -.02em; }
+.row .ttl:hover { color: var(--brand-ink); }
+.row .meta { font: 400 .83rem var(--sans); color: var(--muted); }
+.row .meta a { color: var(--muted); }
+.row .meta a:hover { color: var(--brand-ink); }
+.row .meta b { font-weight: 600; color: var(--ink-2); }
+.row .desc { font: 400 .92rem/1.5 var(--sans); color: var(--ink-2); }
+.row .amt .p { font: 700 1.1rem var(--sans); font-variant-numeric: tabular-nums; letter-spacing: -.02em; }
+.row .amt .go { font: 500 .82rem var(--sans); font-style: normal; color: var(--brand-ink); }
+
+/* --- plates --- */
+.plates, .mosaic { border-radius: var(--radius); overflow: hidden; }
+.plate .cap .t { font: 600 .97rem/1.3 var(--sans); letter-spacing: -.02em; }
+.plate:hover .cap .t { color: var(--brand-ink); }
+.plate .cap .m { font: 400 .78rem var(--sans); }
+.plate .cap .p { font: 700 1rem var(--sans); font-variant-numeric: tabular-nums; }
+.plate .no { background: var(--ink); color: #fff; font: 500 .7rem var(--sans); font-variant-numeric: tabular-nums; }
+
+/* --- bands: violet replaces the ink band, tint replaces oxblood --- */
+.bleed-ink { background: var(--brand); color: #fff; }
+.bleed-ink h2, .bleed-ink h3, .bleed-ink .claim { color: #fff; }
+.bleed-ink p { color: #EADFFF; }
+.bleed-ink a { color: #fff; border-bottom: 1.5px solid rgba(255,255,255,.55) !important; }
+.bleed-ink a:hover { border-bottom-color: #fff !important; }
+.bleed-ink .claim em { color: #fff; font-style: normal; text-decoration: underline; text-decoration-thickness: 3px; text-underline-offset: 5px; }
+.bleed-red { background: var(--ink); color: #fff; }
+.bleed-red h2, .bleed-red h3, .bleed-red .claim { color: #fff; }
+.bleed-red p { color: #B4B4BF; }
+.bleed-red a { color: #fff; border-bottom: 1.5px solid rgba(255,255,255,.5); }
+.bleed-red a:hover { background: none; color: var(--brand); border-bottom-color: var(--brand); }
+.bleed-red .claim em { color: var(--brand); font-style: normal; }
+.bleed-tint { background: var(--surface); }
+.bleed-green { background: var(--brand-soft); border-top: 1px solid var(--line); border-bottom: 1px solid var(--line); }
+
+.claim { font: 700 clamp(1.4rem, 2.8vw, 2.1rem)/1.18 var(--display); letter-spacing: -.035em; max-width: 26ch; }
+
+/* --- figures --- */
+.figures { border-radius: var(--radius); overflow: hidden; }
+.figure .v { font: 700 1.8rem/1 var(--display); letter-spacing: -.04em; color: var(--brand-ink); font-variant-numeric: tabular-nums; }
+.figure .k { font: 400 .88rem var(--sans); font-style: normal; color: var(--muted); }
+
+/* --- ledge --- */
+.ledge { border-top: 1px solid var(--line); border-bottom: 1px solid var(--line); box-shadow: none; padding: 34px 0; }
+.ledge .after a {
+  font: 500 .92rem var(--sans); border: 1.5px solid var(--line-2); border-radius: var(--radius);
+  color: var(--ink); padding: .55rem .9rem;
+}
+.ledge .after a:first-child { background: var(--brand); border-color: var(--brand); color: #fff; }
+.ledge .after a:hover { border-color: var(--brand); color: var(--brand-ink); background: var(--brand-soft); }
+.ledge .after a:first-child:hover { background: var(--brand-ink); color: #fff; }
+
+/* --- spec, side, tags, cards, buttons --- */
+.spec dt { font: 500 .82rem var(--sans); font-style: normal; color: var(--muted); }
+.spec dd { font: 400 .96rem var(--sans); }
+.spec dd a { color: var(--brand-ink); }
+.side { border-radius: var(--radius); background: var(--surface); border-color: var(--line); }
+.side h4 { font: 600 .76rem var(--sans); font-style: normal; letter-spacing: .09em; text-transform: uppercase; color: var(--muted); }
+.tag { border-radius: 999px; font: 500 .8rem var(--sans); font-style: normal; padding: .18rem .6rem; }
+.btn { border-radius: var(--radius); font: 500 .92rem var(--sans); }
+.btn-brand { background: var(--brand); border-color: var(--brand); color: #fff; }
+.btn-brand:hover { background: var(--brand-ink); border-color: var(--brand-ink); }
+.card, .slot, .note, .machine, .tier { border-radius: var(--radius); }
+.note { border-left: 3px solid var(--brand); background: var(--brand-soft); }
+.slot { background: var(--surface); border: 1px dashed var(--line-2); border-radius: var(--radius); }
+.count, .bar .count { font: 400 .9rem var(--sans); font-style: normal; }
+.faq .qa:first-child { border-top: 1px solid var(--line); box-shadow: none; }
+.faq .qa h2 { font: 700 1.2rem var(--display); letter-spacing: -.03em; }
+.faq .qa p, .post p, .post li, .jrow p { font-family: var(--sans); }
+.jlist { border-top: 1px solid var(--line); box-shadow: none; }
+.jrow h2 { font-family: var(--display); letter-spacing: -.035em; }
+
+/* --- footer stays dark: it anchors the page and keeps violet rare --- */
+.foot { background: var(--ink); }
+.foot, .foot p, .foot span, .foot li { color: #A8A8B4; }
+.foot a, .foot li a, .foot-cols a { color: #D5D5DD; font-family: var(--sans); font-size: .93rem; }
+.foot a:hover, .foot li a:hover { color: #fff; }
+.foot h4 { font: 600 .74rem var(--sans); font-style: normal; letter-spacing: .09em; text-transform: uppercase; color: #8B5CFF; opacity: 1; }
+.foot .mark .m1 { color: #fff !important; }
+.foot .mark .m1 i { color: #8B5CFF; }
+.foot .rail, .foot-end, .foot .sm, .foot .muted { color: #8E8E9A; font-style: normal; }
+.foot .rail b { color: #D5D5DD; }
+
+/* --- tiers --- */
+.tier { border: 1px solid var(--line); }
+.tier.pick { border: 2px solid var(--brand); }
+.tier .nm { font: 700 1.25rem var(--display); letter-spacing: -.03em; }
+.tier .amt { font: 700 2.9rem var(--display); letter-spacing: -.045em; }
+.tier .per { font: 400 .9rem var(--sans); font-style: normal; }
+.tier ul { font-family: var(--sans); }
+.step h3, .step p { font-family: var(--sans); }
+.step h3 { font-family: var(--display); letter-spacing: -.025em; }
+
+/* ============================================================
+   ORANGE PRIMARY / VIOLET SECONDARY — and a light page
+   White text needs the deep shades, not the bright ones. Any
+   element carrying white text pins its own background so it
+   does not invert in dark mode and lose contrast.
+   ============================================================ */
+
+:root { --on-brand: #C2410C; --on-accent: #5A21D6; }
+
+/* buttons and anything white-on-colour */
+.btn-brand, .top-act .cta, .find button,
+.state .after a:first-child, .ledge .after a:first-child {
+  background: var(--on-brand); border-color: var(--on-brand); color: #fff;
+}
+.btn-brand:hover, .top-act .cta:hover, .find button:hover,
+.state .after a:first-child:hover, .ledge .after a:first-child:hover {
+  background: #9E340A; border-color: #9E340A; color: #fff;
+}
+
+/* the mark's accent stop stays the bright orange — it is a graphic, not text */
+.mark .m1 i { color: var(--brand); }
+.foot .mark .m1 i { color: #FF7A45; }
+
+/* links and small accent text use the deep shade */
+a:hover, .rule .more, .row .amt .go, .row .meta a:hover, .ix:hover, .ix:hover .ct,
+.register .nm a:hover, .row .ttl:hover, .plate:hover .cap .t, .spec dd a,
+.state .after a:hover, .label, .eyebrow, .kick { color: var(--brand-ink); }
+.strip a:hover, .strip a[aria-current] { color: var(--brand-ink); border-bottom-color: var(--brand); }
+
+/* violet: figures, counts, verified state — never on the same element as orange */
+.figure .v { color: var(--accent-ink); }
+.register .ix-n { color: var(--accent-ink); }
+.tag-ok { background: var(--accent-soft); border-color: var(--accent); color: var(--accent-ink); }
+
+/* bands: orange leads, violet supports */
+.bleed-ink { background: var(--on-brand); }
+.bleed-ink p { color: #FFE3D6; }
+.bleed-green { background: var(--accent-soft); border-color: var(--line); }
+.bleed-green .figure { background: var(--paper); }
+
+/* --- lighten the page: the colophon is a light surface, not a black slab --- */
+.foot { background: var(--surface); border-top: 1px solid var(--line); }
+.foot, .foot p, .foot span, .foot li { color: var(--ink-2); }
+.foot a, .foot li a, .foot-cols a { color: var(--ink-2); }
+.foot a:hover, .foot li a:hover { color: var(--brand-ink); }
+.foot h4 { color: var(--muted); }
+.foot .mark .m1 { color: var(--ink) !important; }
+.foot .rail, .foot-end, .foot .sm, .foot .muted { color: var(--muted); }
+.foot .rail b { color: var(--ink-2); }
+.foot-end { border-top: 1px solid var(--line); }
+
+/* the closing band was near-black; make it the one dark note on the page */
+.bleed-red { background: var(--ink); }
+.bleed-red p { color: #B4B4BF; }
+.bleed-red .claim em { color: #FF9468; }
+.bleed-red a:hover { color: #FF9468; border-bottom-color: #FF9468; }
+
+/* --- dark mode: pin what carries white text --- */
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) { --on-brand: #C2410C; --on-accent: #5A21D6; }
+  :root:not([data-theme="light"]) .foot { background: var(--surface); }
+  :root:not([data-theme="light"]) .plate .fig,
+  :root:not([data-theme="light"]) .row .th,
+  :root:not([data-theme="light"]) .mosaic a { background: #fff; }
+}
+
+/* ============================================================
+   CONTRAST CORRECTIONS — audited, both schemes
+   Three real bugs behind most of these: elements carrying white
+   text on var(--ink) invert in dark mode and lose their ground;
+   the bright orange is a fill colour that was leaking onto small
+   text; and separators were set in a line colour, not a text one.
+   ============================================================ */
+
+html { background: var(--paper); color: var(--ink); }
+
+/* separators are punctuation, but they still have to be legible */
+.orient .sep, .row .meta .sep, .rail .sep, .crumb span, .sep { color: var(--muted); }
+
+/* anything white-on-dark pins its ground so dark mode cannot flip it */
+.bleed-red { background: #0E0E11; color: #fff; }
+.bleed-red h2, .bleed-red h3, .bleed-red .claim { color: #fff; }
+.bleed-red p { color: #C4C4CE; }
+.bleed-red .claim em { color: #FF9468; font-style: normal; }
+.bleed-red a { color: #fff; border-bottom-color: rgba(255,255,255,.5); }
+.bleed-red a:hover { color: #FF9468; border-bottom-color: #FF9468; }
+.plate .no { background: #0E0E11; color: #fff; }
+
+/* on the orange band the label and body are light, not the accent again */
+.bleed-ink .label, .bleed-ink .eyebrow, .bleed-ink .kick { color: #FFE4D8; }
+.bleed-ink p { color: #FFEFE8; }
+
+/* the bright orange is for fills; small text takes the deep one */
+.tag-brand { background: var(--brand-soft); border-color: var(--brand-ink); color: var(--brand-ink); }
+a[style*="--brand)"], .sheet-top a { color: var(--brand-ink); }
+
+/* the accent stop is part of the logotype: bold, so it reads as a graphic */
+.mark .m1 i { font-weight: 800; }
+
+/* the label rule above sets the deep orange globally; on the orange band and in
+   the (now light) colophon it has to be overridden with matching specificity */
+.bleed-ink p.label, .bleed-ink .label, .bleed-ink .eyebrow, .bleed-ink .kick { color: #FFE4D8; }
+.foot .mark .m1 i { color: var(--brand-ink); }
+
+.bleed-ink p.label, .bleed-ink .label, .bleed-ink .eyebrow, .bleed-ink .kick { color: #FFF3EE; }
+
+/* --- the application form --- */
+.apply { border: 1px solid var(--line); border-radius: var(--radius-lg); padding: 24px; background: var(--paper); }
+.apply .field { margin-bottom: 15px; }
+.apply label { display: block; font: 500 .88rem var(--sans); margin-bottom: .33rem; color: var(--ink); }
+.apply input, .apply select, .apply textarea {
+  width: 100%; border: 1.5px solid var(--line-2); border-radius: var(--radius);
+  padding: .68rem .75rem; font: 400 .97rem var(--sans); background: var(--paper); color: var(--ink);
+  min-height: 46px;
+}
+.apply textarea { min-height: 104px; resize: vertical; }
+.apply input:focus-visible, .apply select:focus-visible, .apply textarea:focus-visible {
+  outline: 3px solid var(--brand); outline-offset: 1px; border-color: var(--brand);
+}
+.apply input::placeholder, .apply textarea::placeholder { color: var(--muted); }
+.btn-lg { padding: .82rem 1.2rem; font-size: 1rem; }

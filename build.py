@@ -105,7 +105,7 @@ def head(title, desc, path, extra="", ld=None, og="default", og_alt=None):
 <meta name="description" content="{e(desc)}">
 <meta name="robots" content="index, follow, max-image-preview:large">
 <link rel="canonical" href="{url}">
-<meta name="theme-color" content="#16181C">
+<meta name="theme-color" content="#6E3BFF">
 <meta name="color-scheme" content="light dark">
 <link rel="icon" href="/favicon.ico" sizes="32x32">
 <link rel="icon" href="/assets/icons/icon.svg" type="image/svg+xml">
@@ -125,8 +125,8 @@ def head(title, desc, path, extra="", ld=None, og="default", og_alt=None):
 <meta name="twitter:title" content="{e(title)}">
 <meta name="twitter:description" content="{e(desc)}">
 <meta name="twitter:image" content="{BASE}/assets/og/{og}.jpg">
-<link rel="preload" href="/assets/fonts/Newsreader-normal-400-5.woff2" as="font" type="font/woff2" crossorigin>
-<link rel="preload" href="/assets/fonts/Archivo-normal-400-1.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="/assets/fonts/Outfit-400-5.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="/assets/fonts/BricolageGrotesque-700-2.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="stylesheet" href="/assets/fonts.css">
 <link rel="stylesheet" href="/assets/site.css">
 <script src="/assets/app.js" defer></script>
@@ -138,6 +138,23 @@ def head(title, desc, path, extra="", ld=None, og="default", og_alt=None):
 <a class="skip" href="#main">Skip to content</a>
 """
 
+# The mark: a plug. The name is Commerce Plugs and the action we are selling is
+# "plug your store in", so the glyph says it literally rather than abstractly.
+# Two prongs and a chunky body survive 16px; a cord or a socket slot does not.
+def plug_svg(size=30, fill="#F15A22", glyph="#fff", rx=16):
+    return (f'<svg viewBox="0 0 64 64" width="{size}" height="{size}" aria-hidden="true" focusable="false">'
+            f'<rect x="2" y="2" width="60" height="60" rx="{rx}" fill="{fill}"/>'
+            f'<path d="M20 13h24a3 3 0 0 1 3 3v12a11 11 0 0 1-11 11H28a11 11 0 0 1-11-11V16a3 3 0 0 1 3-3z" fill="{glyph}"/>'
+            f'<rect x="24" y="41" width="6.5" height="11" rx="3.25" fill="{glyph}"/>'
+            f'<rect x="33.5" y="41" width="6.5" height="11" rx="3.25" fill="{glyph}"/>'
+            '</svg>')
+
+MARK = plug_svg()
+
+def wordmark():
+    """The plug, then commerce + plugs with the weight shift and the accent stop."""
+    return f'{MARK}<span class="m1">commerce<b>plugs</b><i>.</i></span>'
+
 def header(active=None):
     opts = '<option value="">All categories</option>' + "".join(
         f'<option value="{c["slug"]}">{e(c["name"])}</option>' for c in CATS)
@@ -146,7 +163,7 @@ def header(active=None):
         for c in CATS)
     return f"""<header class="top">
 <div class="top-in">
-  <a class="mark" href="/"><span class="m1">{e(BRAND)}</span><span class="m2">Index</span></a>
+  <a class="mark" href="/" aria-label="{e(BRAND)} home">{wordmark()}</a>
   <form class="find" action="/search/" method="get" role="search">
     <label class="sr" for="q">Search independent stores and products</label>
     <select name="c" aria-label="Category">{opts}</select>
@@ -156,7 +173,7 @@ def header(active=None):
   <nav class="top-act" aria-label="Account">
     <a class="no-sm" href="/contents/">Contents</a>\n    <a class="no-sm" href="/stores/">Stores</a>
     <a class="no-sm" href="/how-it-works/">How it works</a>
-    <a class="cta" href="/for-brands/">List your brand</a>
+    <a class="cta" href="/join/">Plug in your store</a>
   </nav>
 </div>
 </header>
@@ -169,7 +186,7 @@ def footer():
     cols = ""
     for group, links in [
         ("Shop", [("Contents","/contents/"),("All stores","/stores/"),("Search","/search/"),("Recently added","/stores/")]),
-        ("For brands", [("Why list here","/for-brands/"),("Pricing","/pricing/"),("How it works","/how-it-works/"),("Advertise","/advertise/"),("Get listed","/join/")]),
+        ("For brands", [("Why list here","/for-brands/"),("Pricing","/pricing/"),("How it works","/how-it-works/"),("Advertise","/advertise/"),("Plug in your store","/join/")]),
         ("Machine", [("Store feed","/feeds/stores.json"),("Product feed","/feeds/products.json"),("MCP server","/.well-known/mcp/server.json"),("llms.txt","/llms.txt")]),
         ("Company", [("About","/about/"),("Journal","/journal/"),("Questions","/faq/"),("Contact","/contact/"),("Advertise","/advertise/"),("Publisher",SITE["publisher_url"])]),
     ]:
@@ -179,7 +196,7 @@ def footer():
 <div class="foot-in">
   <div class="foot-cols">
     <div>
-      <a class="mark" href="/" style="margin-bottom:10px"><span class="m1" style="color:var(--ink)">{e(BRAND)}</span><span class="m2">Index</span></a>
+      <a class="mark" href="/" style="margin-bottom:10px" aria-label="{e(BRAND)} home">{wordmark()}</a>
       <p class="sm muted" style="max-width:34ch">{e(SITE["pitch"])}</p>
       <p class="rail"><b>Index built</b> {TODAY}<span class="dot"></span><b>Stores</b> {len(STORES)}<span class="dot"></span><b>Listings</b> {len(PRODUCTS)}</p>
     </div>
@@ -406,7 +423,7 @@ def page_home():
 <div class="bleed bleed-ink" style="margin-top:44px"><div class="wrap">
   <div class="grid g2" style="gap:40px;align-items:center">
     <div>
-      <p class="label" style="color:var(--mast-accent)">For brands</p>
+      <p class="label">For brands</p>
       <p class="claim">If a machine cannot read your store, it <em>cannot recommend it.</em></p>
       <p>The crawlers behind AI assistants do not run JavaScript, do not log in and do not guess. They pass along what is written down in plain text, at a fixed address, with a date on it. Most independent stores publish none of that.</p>
       <p>Building that record is the entire job here, and it costs {money(SITE["price_entry"])} a month with no contract.</p>
@@ -586,7 +603,7 @@ def page_store(s):
       <h1 style="font-size:clamp(2.2rem,5vw,3.6rem);margin-bottom:.6rem">{e(s["name"])}</h1>
       <p style="font-size:1.1rem;line-height:1.6;color:var(--ink-2)">{about}</p>
       <span class="after" style="display:flex;gap:0 22px;flex-wrap:wrap;margin-top:1.1rem">
-        <a href="{e(s["url"])}" rel="nofollow noopener" target="_blank" style="font:400 1.05rem var(--display);border-bottom:1px solid var(--brand);color:var(--brand)">Visit {e(host(s["url"]))} \u2192</a>
+        <a href="{e(s["url"])}" rel="nofollow noopener" target="_blank" style="font:400 1.05rem var(--display);border-bottom:1px solid var(--brand);color:var(--brand-ink)">Visit {e(host(s["url"]))} \u2192</a>
         <a href="/join/" style="font:400 1.05rem var(--display);border-bottom:1px solid var(--line-2);color:var(--ink-2)">Claim this page</a>
       </span>
     </div>
@@ -873,68 +890,137 @@ def page_how():
         "/how-it-works/", ld=ld_crumbs(trail)) + body)
 
 def page_join():
-    trail = [("Home","/"),("Get listed",None)]
+    trail = [("Home","/"),("Plug in",None)]
     opts = "".join(f'<option value="{c["slug"]}">{e(c["name"])}</option>' for c in CATS)
     endpoint = SITE.get("apply_endpoint")
     email = SITE.get("contact_email")
+    action = endpoint or (f"mailto:{email}" if email else None)
+    enc = "" if endpoint else ' enctype="text/plain"'
 
-    fields = f"""      <div class="field"><label for="f-store">Store name</label><input id="f-store" name="store" required></div>
-      <div class="field"><label for="f-url">Store URL</label><input id="f-url" name="url" type="url" placeholder="https://" required></div>
-      <div class="field"><label for="f-email">Email</label><input id="f-email" name="email" type="email" required></div>
-      <div class="field"><label for="f-cat">Main category</label><select id="f-cat" name="category">{opts}</select></div>
+    fields = f"""      <div class="field"><label for="f-store">Store name</label>
+        <input id="f-store" name="store" autocomplete="organization" required></div>
+      <div class="field"><label for="f-url">Store URL</label>
+        <input id="f-url" name="url" type="url" inputmode="url" placeholder="https://" autocomplete="url" required></div>
+      <div class="field"><label for="f-email">Your email</label>
+        <input id="f-email" name="email" type="email" inputmode="email" autocomplete="email" required></div>
+      <div class="field"><label for="f-cat">Main category</label>
+        <select id="f-cat" name="category">{opts}</select></div>
       <div class="field"><label for="f-plan">Plan</label><select id="f-plan" name="plan">
         <option value="index">Index &mdash; {money(SITE["price_entry"])}/mo</option>
         <option value="pro">Pro &mdash; $49/mo</option>
         <option value="signal">Signal &mdash; $149/mo</option>
-        <option value="unsure">Not sure yet</option></select></div>
-      <div class="field"><label for="f-note">What do you make or sell?</label><textarea id="f-note" name="note" placeholder="A couple of sentences is plenty."></textarea></div>"""
+        <option value="unsure">Not sure yet &mdash; tell me which fits</option></select></div>
+      <div class="field"><label for="f-note">What do you make or sell?</label>
+        <textarea id="f-note" name="note" rows="4" placeholder="A couple of sentences is plenty. If you have a catalog feed or a sitemap, mention it."></textarea></div>
+      <div class="field"><label for="f-how">Anything else?</label>
+        <input id="f-how" name="how" placeholder="Optional &mdash; how you found us, questions, timing"></div>"""
 
-    if endpoint:
-        form = f"""<form class="card" method="post" action="{e(endpoint)}" id="apply">
+    if action:
+        form = f"""<form class="apply" method="post" action="{e(action)}"{enc} id="apply">
 {fields}
-      <button class="btn btn-brand" type="submit" style="width:100%">Send application</button>
-      <p class="xs muted" style="margin:.8rem 0 0">No payment now. We reply within two business days.</p>
-    </form>"""
-    elif email:
-        form = f"""<form class="card" method="post" action="mailto:{e(email)}" enctype="text/plain" id="apply">
-{fields}
-      <button class="btn btn-brand" type="submit" style="width:100%">Send application</button>
-      <p class="xs muted" style="margin:.8rem 0 0">Opens in your mail app. No payment now. We reply within two business days.</p>
+      <button class="btn btn-brand btn-lg" type="submit" style="width:100%">Send application</button>
+      <p class="xs muted" style="margin:.85rem 0 0">No card needed. Nothing is charged until your page is live and you have approved it.</p>
     </form>"""
     else:
-        form = f"""<div class="card">
-      <span class="tag tag-open">Applications opening</span>
-      <h3 style="margin:.6rem 0 .4rem">The application form is not live yet</h3>
-      <p class="sm">Rather than show you a form that posts into a void, we have left it off until the inbox behind it is wired up. It will be here shortly.</p>
-      <p class="sm">If you want to be first in your category, the fastest route in the meantime is to contact {e(SITE["publisher"])} directly through <a href="{e(SITE["publisher_url"])}">{e(host(SITE["publisher_url"]))}</a> and mention {e(BRAND)} and your store URL.</p>
-      <p class="xs muted" style="margin:.8rem 0 0">Founding listings are being reviewed now, {len(CATS)} categories are open, and no payment is taken before a page is live.</p>
+        form = f"""<div class="apply">
+      <span class="tag tag-brand">Opening to founding stores</span>
+      <h3 style="margin:.7rem 0 .5rem">The form is not wired up yet</h3>
+      <p class="sm">Rather than show you a form that posts into a void, it is off until the inbox behind it is connected. It will be live shortly.</p>
+      <p class="sm">In the meantime the fastest way in is to contact {e(SITE["publisher"])} through
+        <a href="{e(SITE["publisher_url"])}">{e(host(SITE["publisher_url"]))}</a> with your store URL and the word
+        &ldquo;{e(BRAND)}&rdquo;. Founding listings are being reviewed now.</p>
+      <p class="xs muted" style="margin:.85rem 0 0">{len(CATS) - len([c for c in CATS if any(p.get("category")==c["slug"] for p in PRODUCTS)])} of {len(CATS)} categories still have no store in them.</p>
     </div>"""
+
+    ld = [ld_crumbs(trail),
+          {"@context":"https://schema.org","@type":"WebPage","name":f"Plug your store into {BRAND}",
+           "url":BASE+"/join/","description":"Apply to list your independent store. Hand-checked, month to month, no commission."},
+          {"@context":"https://schema.org","@type":"Service","name":f"{BRAND} store listing",
+           "provider":{"@id":BASE+"/#org"},
+           "serviceType":"Online store directory listing and machine-readable product record",
+           "areaServed":"Worldwide",
+           "offers":{"@type":"Offer","price":str(SITE["price_entry"]),"priceCurrency":"USD",
+                     "url":BASE+"/pricing/","availability":"https://schema.org/InStock"}}]
 
     body = f"""{header()}
 {crumbs(trail)}
-<main id="main"><div class="wrap mid">
-  <p class="eyebrow">Get listed</p>
-  <h1>Apply to join the index</h1>
-  <p class="lede">Independent stores only. Every applicant is checked by hand, which is the only reason the record is worth anything.</p>
-  <div class="grid g2 mt2" style="gap:30px;align-items:start">
-    {form}
+<main id="main"><div class="wrap">
+  <p class="orient"><b>{len(STORES)}</b> store{"s" if len(STORES)!=1 else ""} listed<span class="sep">/</span>
+    hand-checked<span class="sep">/</span>month to month<span class="sep">/</span>
+    commission taken <b>0%</b></p>
+
+  <section class="state" style="padding:40px 0 30px">
+    <p class="label">Plug in</p>
+    <h1>Plug your store in. <em>Keep every cent of the sale.</em></h1>
+    <p>You already have a store, a checkout and customers. We do not want any of them. What you get here is a page built so machines can read you, in an index shoppers search &mdash; and every link on it goes straight to your own site.</p>
+  </section>
+</div>
+
+<div class="bleed bleed-green"><div class="wrap">
+  <div class="figures">
+    <div class="figure"><span class="v">0%</span><span class="k">commission on your sales</span></div>
+    <div class="figure"><span class="v">{money(SITE["price_entry"])}</span><span class="k">a month to start</span></div>
+    <div class="figure"><span class="v">0</span><span class="k">months minimum term</span></div>
+    <div class="figure"><span class="v">2</span><span class="k">business days to a decision</span></div>
+  </div>
+</div></div>
+
+<div class="wrap">
+  <div class="shell" style="margin-top:34px;grid-template-columns:1.05fr .95fr;gap:44px">
     <div>
-      <h3>What we check</h3>
-      <ul class="sm"><li>You are an independent store, not a marketplace reseller front</li><li>You control your own checkout</li><li>The products are real and the prices on your site are current</li><li>You ship to at least one country reliably</li></ul>
-      <h3 class="mt2">What happens next</h3>
-      <div class="steps" style="margin-top:10px">
-        <div class="step"><div><h3>We verify</h3><p class="sm">Usually within two business days. If we cannot confirm something, we ask you rather than guess.</p></div></div>
-        <div class="step"><div><h3>We write and publish your page</h3><p class="sm">You read it and approve it before it goes live. Nothing about your store gets published that you have not seen.</p></div></div>
-        <div class="step"><div><h3>Billing starts the day you are live</h3><p class="sm">Not before. Month to month after that, cancel whenever.</p></div></div>
-      </div>
-      <div class="note"><p class="sm">We will never ask you for your store password, your payment processor login or your domain registrar credentials. If anyone claiming to be us does, it is not us.</p></div>
+      <div class="rule" style="margin-top:0"><h2>Apply</h2><span class="n">takes about two minutes</span></div>
+      <div style="margin-top:18px">{form}</div>
     </div>
+
+    <div>
+      <div class="rule" style="margin-top:0"><h2>What happens next</h2></div>
+      <div class="steps" style="margin-top:16px">
+        <div class="step"><div><h3>1. We check you are real</h3>
+          <p class="sm">That you are an independent seller rather than a marketplace reseller front, that you run your own checkout, that the products and prices on your site are current, and that you ship somewhere reliably. Usually two business days.</p></div></div>
+        <div class="step"><div><h3>2. We build your record</h3>
+          <p class="sm">Server-rendered page, your facts written as text and marked up in schema.org, your catalog read from your own feed, a verification date, and your listing in every category, type and brand index it belongs in.</p></div></div>
+        <div class="step"><div><h3>3. You approve it</h3>
+          <p class="sm">You see the page before anyone else does. Nothing about your store gets published that you have not read. Anything wrong, we fix and re-date it.</p></div></div>
+        <div class="step"><div><h3>4. Billing starts the day you are live</h3>
+          <p class="sm">Not at application, not at approval. From then it is month to month, cancel in one click, and you keep your page export and your data on the way out.</p></div></div>
+      </div>
+
+      <div class="rule"><h2>What we never do</h2></div>
+      <div class="split pair" style="margin-top:16px">
+        <div>
+          <h3>Yours, always</h3>
+          <ul>
+            <li>The customer, their email, and the reorder</li>
+            <li>The payment and the full margin</li>
+            <li>Your checkout, your returns, your service</li>
+            <li>Your data, exportable any time</li>
+          </ul>
+        </div>
+        <div>
+          <h3>Never ours to sell</h3>
+          <ul>
+            <li>A cut of your sales &mdash; there is none</li>
+            <li>Your position in the index</li>
+            <li>An unlabelled placement</li>
+            <li>Your details, to anyone</li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="note"><p class="sm"><b>We will never ask you</b> for your store password, your payment processor login, or your domain registrar credentials. We do not need them, and anyone claiming to be us who asks is not us.</p></div>
+    </div>
+  </div>
+
+  <div class="ledge">
+    <h2>Not sure it is worth {money(SITE["price_entry"])} a month?</h2>
+    <p>Open your own store in a browser with JavaScript switched off. Whatever is still on screen is roughly what a machine sees when it fetches your page. If that is a logo and a spinner, you already know why this exists.</p>
+    <span class="after"><a href="/for-brands/">Read the argument</a><a href="/pricing/">Compare the tiers</a><a href="/faq/">Questions</a></span>
   </div>
 </div></main>
 {footer()}"""
-    return write("join/index.html", head(f"Apply to list your store | {BRAND}",
-        "Apply to join the index of independent stores. Hand-checked, month to month, no contract, no commission.",
-        "/join/", ld=ld_crumbs(trail)) + body)
+    return write("join/index.html", head(f"Plug your store into {BRAND}",
+        f"Apply to list your independent store. Hand-checked, month to month, no commission, no checkout between you and your customer. From {money(SITE['price_entry'])}.",
+        "/join/", ld=ld) + body)
 
 def page_about():
     trail = [("Home","/"),("About",None)]
@@ -1566,7 +1652,7 @@ Publisher: {SITE['publisher']} ({SITE['publisher_url']}).
     out.append(write("site.webmanifest", json.dumps({
         "name": BRAND, "short_name": SITE["short"],
         "description": SITE["pitch"], "start_url": "/", "scope": "/",
-        "display": "standalone", "background_color": "#F7F6F1", "theme_color": "#16181C",
+        "display": "standalone", "background_color": "#FFFFFF", "theme_color": "#6E3BFF",
         "icons": [{"src": "/assets/icons/icon-192.png", "sizes": "192x192", "type": "image/png"},
                   {"src": "/assets/icons/icon-512.png", "sizes": "512x512", "type": "image/png"},
                   {"src": "/assets/icons/icon.svg", "sizes": "any", "type": "image/svg+xml"}],

@@ -14,11 +14,11 @@ OG   = os.path.join(ROOT, "assets/og")
 F    = os.path.join(ROOT, "tools/fonts")
 os.makedirs(ICON, exist_ok=True); os.makedirs(OG, exist_ok=True)
 
-INK      = (22, 24, 28)
-PAPER    = (247, 246, 241)
-OXBLOOD  = (140, 29, 24)
-PETROL   = (29, 77, 67)
-MUTED    = (154, 149, 139)
+INK      = (14, 14, 17)
+PAPER    = (255, 255, 255)
+OXBLOOD  = (241, 90, 34)      # orange: the primary, on fills and the mark
+PETROL   = (110, 59, 255)     # violet: the secondary, on figures and data
+MUTED    = (95, 95, 105)
 
 def font(name, size):
     return ImageFont.truetype(os.path.join(F, name), size)
@@ -30,18 +30,28 @@ def center(d, box, text, fnt, fill):
 
 # ---------------------------------------------------------------- mark
 def mark(size, bleed=True):
-    """Oxblood plate, cream serif CP, with a rule under it like a printed stamp."""
-    s = size * 4                       # supersample, then downscale
-    im = Image.new("RGBA", (s, s), OXBLOOD + (255,))
+    """Orange tile, white plug: a body with square shoulders and a rounded chin,
+    plus two prongs. Proportions matter more than detail — the body has to stay
+    small enough that the prongs still read as prongs at 16px."""
+    s = size * 8                       # supersample, then downscale
+    im = Image.new("RGBA", (s, s), (0, 0, 0, 0))
     d = ImageDraw.Draw(im)
-    if not bleed:                      # maskable/app icon keeps a safe margin
-        im = Image.new("RGBA", (s, s), (0, 0, 0, 0))
-        d = ImageDraw.Draw(im)
-        d.rectangle([0, 0, s, s], fill=OXBLOOD)
-    fnt = font("Newsreader.ttf", int(s * 0.52))
-    center(d, (0, int(-s * 0.04), s, int(s * 0.92)), "CP", fnt, PAPER)
-    # the rule: a printer's mark, and it reads as a bar even at 16px
-    d.rectangle([int(s * 0.22), int(s * 0.80), int(s * 0.78), int(s * 0.855)], fill=PAPER)
+    u = s / 64.0
+    def b(*v): return [x * u for x in v]
+
+    d.rounded_rectangle(b(1, 1, 63, 63), radius=int(16 * u), fill=OXBLOOD)
+
+    # body: 24 wide, 19 tall, sitting high so the prongs have room
+    bx0, bx1, by0, by1 = 20.0, 44.0, 13.0, 32.0
+    d.rounded_rectangle(b(bx0, by0, bx1, by1), radius=int(3 * u), fill=PAPER)
+    d.rounded_rectangle(b(bx0, by0 + 7, bx1, by1), radius=int(9 * u), fill=PAPER)
+
+    # prongs: long enough to be unmistakable, thick enough to survive 16px
+    pw = 7.0 if size < 48 else 6.2
+    gap = 8.0
+    for x in (32 - gap / 2 - pw, 32 + gap / 2):
+        d.rounded_rectangle(b(x, 33.5, x + pw, 51), radius=int(pw / 2 * u), fill=PAPER)
+
     return im.resize((size, size), Image.LANCZOS)
 
 for n in (16, 32, 48, 180, 192, 512):
@@ -53,10 +63,10 @@ ims[0].save(os.path.join(ROOT, "favicon.ico"), sizes=[(16, 16), (32, 32), (48, 4
 # an SVG mark too: sharp at any size, and it is what modern browsers prefer
 open(os.path.join(ICON, "icon.svg"), "w").write(
     '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64">'
-    '<rect width="64" height="64" fill="#8C1D18"/>'
-    '<text x="32" y="43" text-anchor="middle" fill="#F7F6F1" '
-    'font-family="Newsreader,Times New Roman,Georgia,serif" font-weight="600" font-size="33">CP</text>'
-    '<rect x="14" y="51" width="36" height="3.5" fill="#F7F6F1"/></svg>')
+    '<rect x="2" y="2" width="60" height="60" rx="16" fill="#F15A22"/>'
+    '<path d="M23 13h18a3 3 0 0 1 3 3v7a9 9 0 0 1-9 9h-6a9 9 0 0 1-9-9v-7a3 3 0 0 1 3-3z" fill="#fff"/>'
+    '<rect x="24.2" y="33.5" width="6.2" height="17.5" rx="3.1" fill="#fff"/>'
+    '<rect x="33.6" y="33.5" width="6.2" height="17.5" rx="3.1" fill="#fff"/></svg>')
 
 # ---------------------------------------------------------------- og cards
 W, H = 1200, 630
@@ -81,32 +91,31 @@ def price(v):
 def og(path, kicker, title, facts, accent=OXBLOOD):
     im = Image.new("RGB", (W, H), PAPER)
     d  = ImageDraw.Draw(im)
-    d.rectangle([0, 0, W, 10], fill=accent)                       # head rule
-    d.rectangle([64, 96, W - 64, 99], fill=INK)                   # scotch rule
-    d.rectangle([64, 103, W - 64, 104], fill=INK)
-
-    d.text((64, 52), kicker.upper(), font=font("Archivo.ttf", 23), fill=accent)
+    d.rectangle([0, 0, 12, H], fill=accent)                        # spine
+    im.paste(mark(56), (64, 48), mark(56))                         # the icon
+    d.text((136, 62), kicker.upper(), font=font("Body.ttf", 23), fill=PETROL)
+    d.rectangle([64, 124, W - 64, 125], fill=(227, 227, 231)) 
 
     size = 86 if len(title) < 26 else (68 if len(title) < 46 else 54)
-    fnt  = font("Newsreader.ttf", size)
+    fnt  = font("Display.ttf", size)
     lines = wrap(d, title, fnt, W - 128)[:3]
-    y = 150
+    y = 164
     for ln in lines:
         d.text((64, y), ln, font=fnt, fill=INK); y += int(size * 1.12)
 
     if facts:
         fy = H - 150
-        d.rectangle([64, fy - 34, W - 64, fy - 33], fill=(207, 203, 192))
+        d.rectangle([64, fy - 34, W - 64, fy - 33], fill=(227, 227, 231))
         x = 64
         for k, v in facts[:4]:
-            d.text((x, fy), str(v), font=font("Newsreader.ttf", 46), fill=PETROL)
-            d.text((x, fy + 60), k, font=font("Newsreader-reg.ttf", 25), fill=(119, 125, 133))
+            d.text((x, fy), str(v), font=font("Display.ttf", 46), fill=PETROL)
+            d.text((x, fy + 60), k, font=font("Body.ttf", 25), fill=MUTED)
             x += 285
 
     d.rectangle([0, H - 56, W, H], fill=INK)
-    d.text((64, H - 44), "commerceplugs.com", font=font("Archivo.ttf", 25), fill=PAPER)
-    d.text((W - 64 - d.textlength("The index of independent stores", font=font("Archivo.ttf", 25)), H - 44),
-           "The index of independent stores", font=font("Archivo.ttf", 25), fill=(154, 149, 139))
+    d.text((64, H - 44), "commerceplugs.com", font=font("Body.ttf", 25), fill=PAPER)
+    d.text((W - 64 - d.textlength("The index of independent stores", font=font("Body.ttf", 25)), H - 44),
+           "The index of independent stores", font=font("Body.ttf", 25), fill=(142, 142, 154))
     im.save(path, quality=88, optimize=True)
     return path
 
