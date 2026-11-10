@@ -71,6 +71,8 @@ def icon(key):
 def write(path, body):
     full = D(path)
     os.makedirs(os.path.dirname(full), exist_ok=True)
+    if path.endswith(".html"):  # network links to the publisher stay nofollow (link-scheme policy)
+        body = re.sub(r'<a href="(https://(?:www\.)?eyetoad\.com[^"]*)"(?![^>]*\brel=)', r'<a href="\1" rel="nofollow"', body)
     open(full, "w", encoding="utf-8").write(body)
     return path
 
@@ -103,7 +105,7 @@ def head(title, desc, path, extra="", ld=None, og="default", og_alt=None):
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>{e(title)}</title>
 <meta name="description" content="{e(desc)}">
-<meta name="robots" content="index, follow, max-image-preview:large">
+{"" if 'name="robots"' in extra else '<meta name="robots" content="index, follow, max-image-preview:large">'}
 <link rel="canonical" href="{url}">
 <meta name="theme-color" content="#6E3BFF">
 <meta name="color-scheme" content="light dark">
@@ -570,6 +572,7 @@ def page_category(c):
         head(f"{c['name']} from independent stores | {BRAND}",
              (c["blurb"] + f" {len(prods)} listings from independent sellers, bought direct from the brand.")[:158],
              f"/c/{c['slug']}/", ld=ld, og=f"cat-{c['slug']}",
+             extra=("" if prods else '<meta name="robots" content="noindex, follow">'),
              og_alt=f"{c['name']} on the {BRAND} index") + body)
 
 def page_store(s):
@@ -1722,10 +1725,10 @@ listings. Store counts and listing counts in this file are literal.
 Publisher: {SITE['publisher']} ({SITE['publisher_url']}).
 """))
 
-    urls = ["/", "/contents/", "/stores/", "/search/", "/for-brands/", "/pricing/",
+    urls = ["/", "/contents/", "/stores/", "/for-brands/", "/pricing/",
             "/how-it-works/", "/join/", "/about/", "/contact/", "/advertise/", "/faq/", "/journal/"]
     urls += [f"/journal/{x['slug']}/" for x in JOURNAL]
-    urls += [f"/c/{c['slug']}/" for c in CATS]
+    urls += [f"/c/{c['slug']}/" for c in CATS if c["products"]]  # empty categories are noindex
     urls += [f"/t/{k}/" for k in TYPES]
     urls += [f"/b/{k}/" for k in BRANDS]
     urls += [f"/stores/{s['slug']}/" for s in STORES]
